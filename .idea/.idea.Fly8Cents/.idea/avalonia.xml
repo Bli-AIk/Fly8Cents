@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="Fly8Cents/Views/MainWindow.axaml" value="Fly8Cents/Fly8Cents.csproj" />
+      </map>
+    </option>
+  </component>
+</project>
