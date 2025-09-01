@@ -59,7 +59,6 @@ public partial class MainWindow : Window
         }
         finally
         {
-            // 无论成功还是失败，都重新启用按钮
             if (sender is Button b2)
             {
                 b2.IsEnabled = true;
@@ -69,7 +68,6 @@ public partial class MainWindow : Window
 
     private static Task<bool> RunFfmpegAsync(string ffmpegPath, string arguments)
     {
-        // 使用 TaskCompletionSource 来创建一个可以手动控制完成状态的 Task
         var tcs = new TaskCompletionSource<bool>();
 
         var process = new Process
@@ -83,12 +81,9 @@ public partial class MainWindow : Window
                 RedirectStandardError = true,
                 CreateNoWindow = true,
             },
-            // 2. 启用 Exited 事件，这是 WaitForExitAsync 的基础
             EnableRaisingEvents = true
         };
 
-        // 3. 订阅事件以实时获取输出
-        // FFmpeg 的进度信息通常输出到 StandardError
         process.ErrorDataReceived += (s, e) =>
         {
             if (!string.IsNullOrEmpty(e.Data))
@@ -101,26 +96,21 @@ public partial class MainWindow : Window
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
-                // 标准输出也打印出来，以防有意外信息
                 Console.WriteLine($"[STDOUT] {e.Data}");
             }
         };
 
-        // 绑定进程退出时的事件
         process.Exited += (s, e) =>
         {
-            // 检查退出代码
             if (process.ExitCode == 0)
             {
-                tcs.SetResult(true); // 成功
+                tcs.SetResult(true);
             }
             else
             {
-                // 如果进程以错误代码退出，则将 Task 设置为异常状态
                 tcs.SetException(new Exception($"FFmpeg exited with code {process.ExitCode}"));
             }
             
-            // 释放资源
             process.Dispose();
         };
 
@@ -129,11 +119,9 @@ public partial class MainWindow : Window
         
         process.Start();
 
-        // 4. 开始异步读取输出流
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
-        // 返回可以被 await 的 Task
         return tcs.Task;
     }
 }
