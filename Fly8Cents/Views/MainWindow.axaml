@@ -15,6 +15,6 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Button Click="Button_OnClick" Height="100" Width="100" VerticalAlignment="Center" HorizontalAlignment="Center">AuV</Button>
 
 </Window>
