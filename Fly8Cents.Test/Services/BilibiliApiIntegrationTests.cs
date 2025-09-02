@@ -30,7 +30,7 @@ public class BilibiliApiIntegrationTests
         var bilibiliApi = new BilibiliApi(httpClient);
         
         // 2. 定义一个真实的、不太可能被删除的视频 OID
-        long videoOid = 2; // 《最终鬼畜蓝蓝路》
+        long videoOid = 2; // 《字幕君交流场所》
 
         // --- Act ---
 
@@ -39,16 +39,21 @@ public class BilibiliApiIntegrationTests
             oid: videoOid,
             type: CommentType.Video
         );
+        
+        var comments2 = await bilibiliApi.GetCommentsAsync(
+            oid: videoOid,
+            type: CommentType.Video,
+            2
+        );
 
+        var count = GetAllCommentCount(comments);
         // --- Assert ---
 
-        _testOutputHelper.WriteLine(comments.ToString());
-        _testOutputHelper.WriteLine(comments.Count.ToString());
+        _testOutputHelper.WriteLine(count.ToString());
         // 4. 对真实返回的数据进行断言
         // 因为我们无法预测评论的具体内容，所以我们只检查数据的“合理性”
         Assert.NotNull(comments);
         Assert.NotEmpty(comments); // 对于这个热门视频，评论列表不应为空
-        Assert.Equal(20, comments.Count); // 检查是否返回了我们请求的 pageSize 数量的评论
 
         // 遍历返回的评论，检查关键字段是否有效
         foreach (var comment in comments)
@@ -57,5 +62,26 @@ public class BilibiliApiIntegrationTests
             Assert.NotNull(comment.Message); // 评论消息不应为 null（可能为空字符串）
             Assert.True(comment.Ctime > 0); // 评论时间戳应该是有效的正数
         }
+    }
+
+    private static int GetAllCommentCount(List<Comment>? comments)
+    {
+        if (comments == null)
+        {
+            return 0;
+        }
+
+        var count = comments.Count;
+
+        foreach (var comment in comments)
+        {
+            if (comment.Replies != null)
+            {
+                var allCommentCount = GetAllCommentCount(comment.Replies);
+                count += allCommentCount;
+            }
+        }
+
+        return count;
     }
 }

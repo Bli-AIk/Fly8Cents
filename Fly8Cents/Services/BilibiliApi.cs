@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -22,7 +21,7 @@ public class BilibiliApi(HttpClient httpClient)
     /// <param name="noHot">是否不显示热评（0=显示，1=不显示）</param>
     public async Task<List<Comment>> GetCommentsAsync(
         long oid,
-        CommentType type = CommentType.Video,
+        CommentType type,
         int page = 1,
         int pageSize = 20,
         int sort = 1,
@@ -48,18 +47,41 @@ public class BilibiliApi(HttpClient httpClient)
         using var doc = JsonDocument.Parse(json);
         var root = doc.RootElement;
 
-        var list = new List<Comment>();
-        if (!root.TryGetProperty("data", out var data) || !data.TryGetProperty("replies", out var replies) || replies.ValueKind == JsonValueKind.Null)
+        if (!root.TryGetProperty("data", out var data) || !data.TryGetProperty("replies", out var replies) ||
+            replies.ValueKind == JsonValueKind.Null)
         {
-            return list;
+            return [];
         }
 
-        list.AddRange(from reply in replies.EnumerateArray()
-            let uname = reply.GetProperty("member").GetProperty("uname").GetString() ?? ""
-            let message = reply.GetProperty("content").GetProperty("message").GetString() ?? ""
-            let ctime = reply.GetProperty("ctime").GetInt64()
-            select new Comment { UserName = uname, Message = message, Ctime = ctime });
+        return ParseReplies(replies);
+    }
 
-        return list;
+    private static List<Comment> ParseReplies(JsonElement jsonElement)
+    {
+        var comments = new List<Comment>();
+        if (jsonElement.ValueKind != JsonValueKind.Array)
+        {
+            return comments;
+        }
+
+        foreach (var reply in jsonElement.EnumerateArray())
+        {
+            var comment = new Comment
+            {
+                UserName = reply.GetProperty("member").GetProperty("uname").GetString() ?? "",
+                Message = reply.GetProperty("content").GetProperty("message").GetString() ?? "",
+                Ctime = reply.GetProperty("ctime").GetInt64()
+            };
+
+            if (reply.TryGetProperty("replies", out var nestedReplies) &&
+                nestedReplies.ValueKind == JsonValueKind.Array)
+            {
+                comment.Replies = ParseReplies(nestedReplies);
+            }
+
+            comments.Add(comment);
+        }
+
+        return comments;
     }
 }

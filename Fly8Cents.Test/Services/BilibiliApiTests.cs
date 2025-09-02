@@ -142,7 +142,7 @@ public class BilibiliApiTests
         var bilibiliApi = new BilibiliApi(httpClient);
 
         // --- Act ---
-        var comments = await bilibiliApi.GetCommentsAsync(123);
+        var comments = await bilibiliApi.GetCommentsAsync(123, CommentType.Video);
 
         // --- Assert ---
         Assert.NotNull(comments); // 列表不应为 null

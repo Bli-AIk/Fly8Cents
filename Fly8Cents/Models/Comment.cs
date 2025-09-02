@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
+
 namespace Fly8Cents.Models;
 
 public class Comment
@@ -5,17 +8,24 @@ public class Comment
     /// <summary>
     ///     用户名
     /// </summary>
-    public string UserName { get; set; } = "";
+    [JsonPropertyName("uname")]
+    public string UserName { get; init; } = "";
 
     /// <summary>
     ///     评论信息
     /// </summary>
-    public string Message { get; set; } = "";
+    [JsonPropertyName("message")]
+    public string Message { get; init; } = "";
 
     /// <summary>
     ///     评论时间戳
     /// </summary>
-    public long Ctime { get; set; }
+    [JsonPropertyName("ctime")]
+    public long Ctime { get; init; }
+    
+    
+    [JsonPropertyName("replies")]
+    public List<Comment>? Replies { get; set; }
 }
 
 public enum CommentType
