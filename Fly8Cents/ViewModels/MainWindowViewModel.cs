@@ -5,7 +5,9 @@ namespace Fly8Cents.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    public BasicInfoViewModel BasicInfo { get; }
+    public string SessData = "";
+    public QrLoginViewModel QrLogin { get; }
+    public BasicInfoViewModel BasicInfo { get; } = new();
     // public FilterViewModel Filter { get; } = new FilterViewModel();
     // public GenerateViewModel Generate { get; } = new GenerateViewModel();
     // public ResultViewModel Result { get; } = new ResultViewModel();
@@ -13,8 +15,7 @@ public class MainWindowViewModel : ViewModelBase
     private int _selectedIndex;
     public MainWindowViewModel()
     {
-        var biliService = new BiliService();
-        BasicInfo = new BasicInfoViewModel(biliService);
+        QrLogin = new QrLoginViewModel(this);
     }
 
     public int SelectedIndex

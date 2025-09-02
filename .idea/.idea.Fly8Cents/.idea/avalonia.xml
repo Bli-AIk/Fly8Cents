@@ -6,6 +6,7 @@
         <entry key="Fly8Cents/App.axaml" value="Fly8Cents/Fly8Cents.csproj" />
         <entry key="Fly8Cents/Views/BasicInfoView.axaml" value="Fly8Cents/Fly8Cents.csproj" />
         <entry key="Fly8Cents/Views/MainWindow.axaml" value="Fly8Cents/Fly8Cents.csproj" />
+        <entry key="Fly8Cents/Views/QRLoginView.axaml" value="Fly8Cents/Fly8Cents.csproj" />
       </map>
     </option>
   </component>

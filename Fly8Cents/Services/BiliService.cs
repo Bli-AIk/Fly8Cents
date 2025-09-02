@@ -1,24 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Richasy.BiliKernel;
-using Richasy.BiliKernel.Bili.User;
-using Richasy.BiliKernel.Services.User;
-using RichasyKernel;
-
 namespace Fly8Cents.Services;
 
-public class BiliService
+public static class BiliService
 {
-    public readonly IUserService UserService;
-
-    public BiliService()
+    public static UserInfo GetUserInfo(string uid)
     {
-        
-        UserService = new UserService();
+        return new UserInfo("测试", "测试");
     }
 
+    public struct UserInfo(string name, string face)
+    {
+        public readonly string Name = name;
+        public readonly string Face = face;
+    }
 }

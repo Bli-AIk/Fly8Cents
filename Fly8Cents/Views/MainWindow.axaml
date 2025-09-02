@@ -12,6 +12,10 @@
     
     <TabControl SelectedIndex="{Binding SelectedIndex}">
         <!-- 基本信息 -->
+        <TabItem Header="登录">
+            <views:QrLoginView DataContext="{Binding QrLogin}" />
+        </TabItem>
+
         <TabItem Header="基本信息">
             <views:BasicInfoView DataContext="{Binding BasicInfo}" />
         </TabItem>

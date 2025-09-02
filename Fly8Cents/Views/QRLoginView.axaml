@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Fly8Cents.ViewModels"
+             xmlns:qr="clr-namespace:Avalonia.Labs.Qr;assembly=Avalonia.Labs.Qr"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Fly8Cents.Views.QrLoginView"
+             x:DataType="vm:QrLoginViewModel">
+    <Grid RowDefinitions="Auto,Auto,*" Margin="20">
+        <!-- 二维码显示区域 -->
+        <Border Grid.Row="0" BorderBrush="Gray" BorderThickness="1" Padding="10" HorizontalAlignment="Center" VerticalAlignment="Top">
+            <qr:QrCode Data="{Binding QrCodePath}" Width="250" Height="250"
+                       Foreground="Black" Background="White" CornerRadius="16"/>
+        </Border>
+
+        <!-- 操作按钮 -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0" Spacing="10">
+            <Button Content="获取二维码" Command="{Binding RefreshQrCodeCommand}" Width="150"/>
+        </StackPanel>
+        
+        <!-- 提示 -->
+        <TextBlock 
+            Grid.Row="2"
+            Text="{Binding HelpInfo}"
+            FontSize="14"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Bottom"
+            Margin="0,0,0,20"
+            TextWrapping="Wrap"
+            TextAlignment="Center"/>
+
+    </Grid>
+</UserControl>

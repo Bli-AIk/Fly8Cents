@@ -21,19 +21,17 @@ public class BasicInfoViewModel : ViewModelBase
 
     private string _uploaderAvatarUrl = "";
 
-    private string _uploaderNickname = "";
+    private string _uploaderNickname = "沈阳美食家";
 
-    public BasicInfoViewModel(BiliService biliService)
+    public BasicInfoViewModel()
     {
-        CheckUid = ReactiveCommand.CreateFromTask(async () =>
+        CheckUid = ReactiveCommand.Create( () =>
         {
-            var userCard = await biliService.UserService.GetUserInformationAsync(Uid);
-            if (userCard.Profile != null)
-            {
-                UploaderNickname = userCard.Profile.User.Id;
-                UploaderAvatarUrl = userCard.Profile.User.Avatar?.SourceUri.ToString() ?? string.Empty;
-            }
+            var userInfo = BiliService.GetUserInfo(Uid);
 
+            UploaderNickname = userInfo.Name;
+            UploaderAvatarUrl = userInfo.Face;
+                
             Console.WriteLine($"检查 UID: {Uid}, 时间范围: {StartDate:d} - {EndDate:d}");
         });
     }
