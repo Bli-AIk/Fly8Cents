@@ -34,7 +34,7 @@ public class QrLoginViewModel : ViewModelBase
                 {
                     QrCodePath = qrRequestData.Data.Url.ToString();
                     var dataQrcodeKey = qrRequestData.Data.QrcodeKey;
-                    
+
                     Console.WriteLine($"Url: {QrCodePath}");
                     Console.WriteLine($"QrcodeKey: {dataQrcodeKey}");
 
@@ -66,18 +66,23 @@ public class QrLoginViewModel : ViewModelBase
                                 var cookieContainer = new CookieContainer();
 
                                 var baseUri = new Uri("https://www.bilibili.com");
-                                cookieContainer.Add(baseUri, new Cookie("DedeUserID", GetCookieFromQr(generateResponse, "DedeUserID")));
-                                cookieContainer.Add(baseUri, new Cookie("DedeUserID__ckMd5", GetCookieFromQr(generateResponse, "DedeUserID__ckMd5")));
-                                cookieContainer.Add(baseUri, new Cookie("SESSDATA", GetCookieFromQr(generateResponse, "SESSDATA")));
-                                cookieContainer.Add(baseUri, new Cookie("bili_jct", GetCookieFromQr(generateResponse, "bili_jct")));
+                                cookieContainer.Add(baseUri,
+                                    new Cookie("DedeUserID", GetCookieFromQr(generateResponse, "DedeUserID")));
+                                cookieContainer.Add(baseUri,
+                                    new Cookie("DedeUserID__ckMd5",
+                                        GetCookieFromQr(generateResponse, "DedeUserID__ckMd5")));
+                                cookieContainer.Add(baseUri,
+                                    new Cookie("SESSDATA", GetCookieFromQr(generateResponse, "SESSDATA")));
+                                cookieContainer.Add(baseUri,
+                                    new Cookie("bili_jct", GetCookieFromQr(generateResponse, "bili_jct")));
                                 cookieContainer.Add(baseUri, new Cookie("buvid3", await GetBuvid3(httpClient)));
-                                
+
                                 var handler = new HttpClientHandler
                                 {
                                     CookieContainer = cookieContainer
                                 };
                                 httpClient = MainWindowViewModel.GetHttpClient(handler);
-                                
+
                                 break;
                             default:
                                 HelpInfo = "扫描失败，请重试。";
@@ -95,15 +100,29 @@ public class QrLoginViewModel : ViewModelBase
         });
     }
 
+    public string HelpInfo
+    {
+        get => _helpInfo;
+        set => this.RaiseAndSetIfChanged(ref _helpInfo, value);
+    }
+
+    public string QrCodePath
+    {
+        get => _qrCodePath;
+        set => this.RaiseAndSetIfChanged(ref _qrCodePath, value);
+    }
+
+    public ReactiveCommand<Unit, Unit> RefreshQrCodeCommand { get; }
+
     private static async Task<string> GetBuvid3(HttpClient httpClient)
     {
         var response = await httpClient.GetStringAsync(
             "https://api.bilibili.com/x/web-frontend/getbuvid"
         );
-                                
+
         var buvid3Data = Buvid3Data.FromJson(response);
         var buvid3 = buvid3Data.Data.Buvid;
-            Console.WriteLine($"buvid3: {buvid3}");
+        Console.WriteLine($"buvid3: {buvid3}");
         return buvid3;
     }
 
@@ -128,18 +147,4 @@ public class QrLoginViewModel : ViewModelBase
 
         throw new KeyNotFoundException($"{name} cookie was not found in response.");
     }
-
-    public string HelpInfo
-    {
-        get => _helpInfo;
-        set => this.RaiseAndSetIfChanged(ref _helpInfo, value);
-    }
-
-    public string QrCodePath
-    {
-        get => _qrCodePath;
-        set => this.RaiseAndSetIfChanged(ref _qrCodePath, value);
-    }
-
-    public ReactiveCommand<Unit, Unit> RefreshQrCodeCommand { get; }
 }

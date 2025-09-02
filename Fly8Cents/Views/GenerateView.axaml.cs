@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace Fly8Cents.Views;
 
-public partial class QrLoginView : UserControl
+public partial class GenerateView : UserControl
 {
-    public QrLoginView()
+    public GenerateView()
     {
         InitializeComponent();
     }

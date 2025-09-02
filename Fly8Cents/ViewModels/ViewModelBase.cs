@@ -1,9 +1,5 @@
-﻿using System.ComponentModel;
-using ReactiveUI;
+﻿using ReactiveUI;
 
 namespace Fly8Cents.ViewModels;
 
-public class ViewModelBase : ReactiveObject
-{
-    
-}
+public class ViewModelBase : ReactiveObject { }

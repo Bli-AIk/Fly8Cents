@@ -70,11 +70,6 @@ public class BasicInfoViewModel : ViewModelBase
         });
     }
 
-    private static Bitmap GetDefaultBitmap()
-    {
-        return new Bitmap(AssetLoader.Open(new Uri("avares://Fly8Cents/Assets/default.jpg")));
-    }
-
     public string Uid
     {
         get => _uid;
@@ -105,6 +100,11 @@ public class BasicInfoViewModel : ViewModelBase
     {
         get => _uploaderNickname;
         set => this.RaiseAndSetIfChanged(ref _uploaderNickname, value);
+    }
+
+    private static Bitmap GetDefaultBitmap()
+    {
+        return new Bitmap(AssetLoader.Open(new Uri("avares://Fly8Cents/Assets/default.jpg")));
     }
 
     private static async Task<Bitmap> SetImageFromUrl(Uri url)

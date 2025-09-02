@@ -9,18 +9,19 @@
              x:DataType="vm:QrLoginViewModel">
     <Grid RowDefinitions="Auto,Auto,*" Margin="20">
         <!-- 二维码显示区域 -->
-        <Border Grid.Row="0" BorderBrush="Gray" BorderThickness="1" Padding="10" HorizontalAlignment="Center" VerticalAlignment="Top">
+        <Border Grid.Row="0" BorderBrush="Gray" BorderThickness="1" Padding="10" HorizontalAlignment="Center"
+                VerticalAlignment="Top">
             <qr:QrCode Data="{Binding QrCodePath}" Width="250" Height="250"
-                       Foreground="Black" Background="White" CornerRadius="16"/>
+                       Foreground="Black" Background="White" CornerRadius="16" />
         </Border>
 
         <!-- 操作按钮 -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0" Spacing="10">
-            <Button Content="获取二维码" Command="{Binding RefreshQrCodeCommand}" Width="150"/>
+            <Button Content="获取二维码" Command="{Binding RefreshQrCodeCommand}" Width="150" />
         </StackPanel>
-        
+
         <!-- 提示 -->
-        <TextBlock 
+        <TextBlock
             Grid.Row="2"
             Text="{Binding HelpInfo}"
             FontSize="14"
@@ -28,7 +29,7 @@
             VerticalAlignment="Bottom"
             Margin="0,0,0,20"
             TextWrapping="Wrap"
-            TextAlignment="Center"/>
+            TextAlignment="Center" />
 
     </Grid>
 </UserControl>

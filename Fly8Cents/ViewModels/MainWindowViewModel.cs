@@ -5,10 +5,6 @@ namespace Fly8Cents.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    // public FilterViewModel Filter { get; } = new FilterViewModel();
-    // public GenerateViewModel Generate { get; } = new GenerateViewModel();
-    // public ResultViewModel Result { get; } = new ResultViewModel();
-
     private int _selectedIndex;
 
     public MainWindowViewModel()
@@ -19,7 +15,11 @@ public class MainWindowViewModel : ViewModelBase
         BasicInfo = new BasicInfoViewModel(HttpClient);
     }
 
-    private HttpClient HttpClient { get; set; }
+    public FilterViewModel Filter { get; } = new();
+    public GenerateViewModel Generate { get; } = new();
+    public ExportViewModel Export { get; } = new();
+
+    private HttpClient HttpClient { get; }
     public QrLoginViewModel QrLogin { get; }
     public BasicInfoViewModel BasicInfo { get; }
 
@@ -37,7 +37,7 @@ public class MainWindowViewModel : ViewModelBase
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
         httpClient.DefaultRequestHeaders.Add("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
         httpClient.DefaultRequestHeaders.Add("Referer", "https://www.bilibili.com/");
-        
+
         return httpClient;
     }
 }

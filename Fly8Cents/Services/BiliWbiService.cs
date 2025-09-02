@@ -12,7 +12,7 @@ namespace Fly8Cents.Services;
 public class BiliWbiService
 {
     private static readonly HttpClient HttpClient = new();
-    
+
     private static readonly int[] MixinKeyEncTab =
     {
         46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35,
@@ -26,7 +26,9 @@ public class BiliWbiService
         return MixinKeyEncTab.Aggregate("", (s, i) => s + orig[i])[..32];
     }
 
-    private static Dictionary<string, string> EncWbi(Dictionary<string, string> parameters, string imgKey, string subKey)
+    private static Dictionary<string, string> EncWbi(Dictionary<string, string> parameters,
+        string imgKey,
+        string subKey)
     {
         var mixinKey = GetMixinKey(imgKey + subKey);
         var currTime = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
@@ -65,7 +67,7 @@ public class BiliWbiService
     }
 
     /// <summary>
-    /// 给请求参数添加 WBI 签名
+    ///     给请求参数添加 WBI 签名
     /// </summary>
     public async Task<Dictionary<string, string>> SignAsync(Dictionary<string, string> parameters)
     {
