@@ -1,0 +1,3 @@
+[submodule "bili-kernel"]
+	path = bili-kernel
+	url = git@github.com:Richasy/bili-kernel.git
