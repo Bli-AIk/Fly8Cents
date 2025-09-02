@@ -6,11 +6,10 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Fly8Cents.Views.GenerateView"
              x:DataType="vm:GenerateViewModel">
-    <Grid Margin="10" RowDefinitions="Auto,*,Auto,*">
-        <TextBlock Text="开头文本:" Grid.Row="0" Margin="0,5" />
-        <TextBox Grid.Row="1" AcceptsReturn="True" Height="100" />
-
-        <TextBlock Text="结尾文本:" Grid.Row="2" Margin="0,10,0,5" />
-        <TextBox Grid.Row="3" AcceptsReturn="True" Height="100" />
+    <Grid Margin="10" RowDefinitions="25,*,25,*">
+        <TextBlock Text="开头文本" FontSize="16" Grid.Row="0" HorizontalAlignment="Center" />
+        <TextBox Grid.Row="1" AcceptsReturn="True" />
+        <TextBlock Text="结尾文本" FontSize="16" Grid.Row="2" HorizontalAlignment="Center" />
+        <TextBox Grid.Row="3" AcceptsReturn="True" />
     </Grid>
 </UserControl>
