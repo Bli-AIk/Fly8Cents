@@ -6,27 +6,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Richasy.BiliKernel;
 using Richasy.BiliKernel.Bili.User;
+using Richasy.BiliKernel.Services.User;
 using RichasyKernel;
 
 namespace Fly8Cents.Services;
 
-public sealed class BiliService : IHostedService
+public class BiliService
 {
-    private readonly Kernel _kernel = Kernel.CreateBuilder()
-        .AddUserService()
-        .Build();
-    private CancellationToken _cancellationToken;
-    public IUserService UserService = null!;
+    public readonly IUserService UserService;
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public BiliService()
     {
-        _cancellationToken = cancellationToken;
-        UserService = _kernel.Services.GetService<IUserService>() ?? throw new InvalidOperationException();
-        return Task.CompletedTask;
+        
+        UserService = new UserService();
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
 }

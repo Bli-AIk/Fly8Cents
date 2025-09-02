@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Fly8Cents.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Fly8Cents.Views.BasicInfoView"
+             x:DataType="vm:BasicInfoViewModel">
+    
+    <Grid Margin="10" RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="Auto,*">
+        <TextBlock Text="UP主UID:" Grid.Row="0" Grid.Column="0" Margin="10,5"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1">
+            <TextBox Width="300" Text="{Binding Uid, Mode=TwoWay}"/>
+            <Button Content="检查" Command="{Binding CheckUid}" Margin="5,0,0,0"/>
+        </StackPanel>
+
+        <TextBlock Text="评论时间范围:" Grid.Row="1" Grid.Column="0" Margin="10,15"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
+            <DatePicker SelectedDate="{Binding StartDate, Mode=TwoWay}"/>
+            <TextBlock Text=" - " VerticalAlignment="Center" Margin="5,0"/>
+            <DatePicker SelectedDate="{Binding EndDate, Mode=TwoWay}"/>
+        </StackPanel>
+                
+        <!-- UP主信息展示 -->
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0" Orientation="Horizontal" Margin="10,20,0,0" VerticalAlignment="Center" Spacing="10">
+            <Image Source="{Binding UploaderAvatarUrl}" Width="60" Height="60"/>
+            <TextBlock Text="{Binding UploaderNickname}" VerticalAlignment="Center" FontSize="16" FontWeight="Bold"/>
+        </StackPanel>
+
+    </Grid>
+</UserControl>
