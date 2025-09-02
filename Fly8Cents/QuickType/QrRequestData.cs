@@ -6,7 +6,7 @@
 //
 //    var qrLoginData = QrRequestData.FromJson(jsonString);
 
-namespace QuickType.QrResponse.QrRequest
+namespace QuickType.Buvid3.UserSpaceDetails.QrResponse.QrRequest
 {
     using System;
     using System.Collections.Generic;

@@ -15,8 +15,9 @@
 ## 依赖项 / 致谢
 本项目基于以下库而制作：
 - [AvaloniaUI](https://avaloniaui.net/)
+- [Avalonia.Labs](https://github.com/AvaloniaUI/Avalonia.Labs)
 - [FFmpeg](https://github.com/FFmpeg/FFmpeg)
-- [bili-kernel](https://github.com/Richasy/bili-kernel)
+- [bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
 
 本项目参考了以下学习资料：
 - [How to make a Star Wars scrolling / crawl opening text video in 4k | Video crawler](https://www.youtube.com/watch?v=ee-p815fLYM&ab_channel=TheFFMPEGguy)
