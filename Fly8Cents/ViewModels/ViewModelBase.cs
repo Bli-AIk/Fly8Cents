@@ -1,5 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.ComponentModel;
+using ReactiveUI;
 
 namespace Fly8Cents.ViewModels;
 
-public class ViewModelBase : ObservableObject { }
+public class ViewModelBase : ReactiveObject
+{
+    
+}

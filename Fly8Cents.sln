@@ -4,6 +4,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fly8Cents", "Fly8Cents\Fly8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fly8Cents.Test", "Fly8Cents.Test\Fly8Cents.Test.csproj", "{F1852D29-CFC2-4972-891A-459AE0B645D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services.User", "bili-kernel\src\Services\Services.User\Services.User.csproj", "{D1221C2E-2E96-4FC2-9D60-C42A85E4E9C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiliKernel.Abstractions", "bili-kernel\src\BiliKernel.Abstractions\BiliKernel.Abstractions.csproj", "{1CCE96B7-FF67-4E48-A222-04B56907360B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiliKernel.Core", "bili-kernel\src\BiliKernel.Core\BiliKernel.Core.csproj", "{7C8E7F2E-A666-4821-A23A-86BB583159FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiliKernel.Grpc", "bili-kernel\src\BiliKernel.Grpc\BiliKernel.Grpc.csproj", "{967467EE-A9B9-4DE2-8D2D-19A52A8813A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +26,21 @@ Global
 		{F1852D29-CFC2-4972-891A-459AE0B645D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1852D29-CFC2-4972-891A-459AE0B645D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1852D29-CFC2-4972-891A-459AE0B645D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1221C2E-2E96-4FC2-9D60-C42A85E4E9C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1221C2E-2E96-4FC2-9D60-C42A85E4E9C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1221C2E-2E96-4FC2-9D60-C42A85E4E9C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1221C2E-2E96-4FC2-9D60-C42A85E4E9C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CCE96B7-FF67-4E48-A222-04B56907360B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CCE96B7-FF67-4E48-A222-04B56907360B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CCE96B7-FF67-4E48-A222-04B56907360B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CCE96B7-FF67-4E48-A222-04B56907360B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C8E7F2E-A666-4821-A23A-86BB583159FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C8E7F2E-A666-4821-A23A-86BB583159FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C8E7F2E-A666-4821-A23A-86BB583159FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C8E7F2E-A666-4821-A23A-86BB583159FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{967467EE-A9B9-4DE2-8D2D-19A52A8813A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{967467EE-A9B9-4DE2-8D2D-19A52A8813A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{967467EE-A9B9-4DE2-8D2D-19A52A8813A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{967467EE-A9B9-4DE2-8D2D-19A52A8813A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
