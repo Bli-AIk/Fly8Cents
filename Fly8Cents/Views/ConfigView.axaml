@@ -4,13 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Fly8Cents.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Fly8Cents.Views.FilterView"
-             x:DataType="vm:FilterViewModel">
+             x:Class="Fly8Cents.Views.ConfigView"
+             x:DataType="vm:ConfigViewModel">
     <Grid Margin="10" RowDefinitions="Auto,*" ColumnDefinitions="*,*">
         <!-- 黑名单 -->
         <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Margin="5" Padding="5">
             <Grid RowDefinitions="Auto,Auto,Auto">
-                <TextBlock Text="黑名单关键词" FontWeight="Bold" Margin="0,0,0,5" Grid.Row="0" />
+                <TextBlock Text="黑名单关键词" FontWeight="Bold" Margin="0,0,0,5" Grid.Row="0"
+                           HorizontalAlignment="Center"/>
 
                 <!-- 固定高度的 ListBox -->
                 <ListBox ItemsSource="{Binding BlackList}"
@@ -33,7 +34,8 @@
         <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Margin="5" Padding="5"
                 Grid.Row="0" Grid.Column="1">
             <Grid RowDefinitions="Auto,Auto,Auto">
-                <TextBlock Text="白名单关键词" FontWeight="Bold" Margin="0,0,0,5" Grid.Row="0" />
+                <TextBlock Text="白名单关键词" FontWeight="Bold" Margin="0,0,0,5" Grid.Row="0"
+                           HorizontalAlignment="Center" />
 
                 <!-- 固定高度的 ListBox -->
                 <ListBox ItemsSource="{Binding WhiteList}"
@@ -51,18 +53,5 @@
                 </StackPanel>
             </Grid>
         </Border>
-
-
-        <!-- AI 检索 -->
-        <Grid Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0" Margin="5" RowDefinitions="Auto,*">
-
-            <CheckBox Content="对剩余评论进行 AI 检索" Grid.Row="0"
-                      IsChecked="{Binding AiCheck, Mode=TwoWay}" />
-            <TextBox Grid.Row="1" AcceptsReturn="True" 
-                     IsEnabled="{Binding AiCheck}"
-                     Text="{Binding AiPrompt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
-        </Grid>
     </Grid>
-
-
 </UserControl>

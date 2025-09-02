@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Fly8Cents.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Fly8Cents.Views.TextSettingsView"
+             x:DataType="vm:TextSettingsViewModel">
+    <Grid Margin="10" RowDefinitions="25,*,*" ColumnDefinitions="*,*">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="开头文本" FontSize="16" HorizontalAlignment="Center" />
+        <TextBox Grid.Row="1" Grid.Column="0" AcceptsReturn="True" Margin="5"
+                 Text="{Binding StartText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="结尾文本" FontSize="16" HorizontalAlignment="Center" />
+        <TextBox Grid.Row="1" Grid.Column="1" AcceptsReturn="True" Margin="5"
+                 Text="{Binding EndText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+
+        <!-- AI 检索 -->
+        <Grid Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0" Margin="5" RowDefinitions="Auto,*">
+
+            <CheckBox Content="对剩余评论进行 AI 检索" Grid.Row="0"
+                      IsChecked="{Binding AiCheck, Mode=TwoWay}" />
+            <TextBox Grid.Row="1" AcceptsReturn="True"
+                     IsEnabled="{Binding AiCheck}"
+                     Text="{Binding AiPrompt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+        </Grid>
+    </Grid>
+</UserControl>

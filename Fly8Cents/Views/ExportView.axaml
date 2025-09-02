@@ -3,14 +3,69 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Fly8Cents.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="Fly8Cents.Views.ExportView"
              x:DataType="vm:ExportViewModel">
-    <Grid Margin="10" RowDefinitions="*,Auto">
-        <TextBox Grid.Row="0" AcceptsReturn="True" IsReadOnly="True" Text="这里显示生成的结果..." />
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="生成并保存" Margin="5,0" />
-            <Button Content="复制到剪贴板" Margin="5,0" />
+
+    <Grid Margin="10" RowDefinitions="Auto,*,Auto" RowSpacing="10">
+        <!-- 顶部爬取评论 + 控制台输出 -->
+        <StackPanel Grid.Row="0" Orientation="Vertical" Spacing="5">
+            <Button Content="爬取评论"
+                    Command="{Binding FetchCommentsCommand}"
+                    HorizontalAlignment="Left" />
+
+            <ScrollViewer Height="100" VerticalScrollBarVisibility="Auto">
+                <TextBlock Text="{Binding ConsoleOutput}" 
+                           FontFamily="Consolas"
+                           TextWrapping="Wrap" />
+            </ScrollViewer>
+        </StackPanel>
+
+        <!-- 中间大文本框，可编辑 -->
+        <TextBox Grid.Row="1" 
+                 AcceptsReturn="True" 
+                 TextWrapping="Wrap"
+                 Text="{Binding CommentsText, Mode=TwoWay}" />
+
+        <!-- 底部导出及视频参数 -->
+        <StackPanel Grid.Row="2" Orientation="Vertical" Spacing="10">
+
+            <!-- 视频参数 -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <!-- 分辨率 -->
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="分辨率" />
+                    <ComboBox ItemsSource="{Binding ResolutionOptions}" 
+                              SelectedItem="{Binding SelectedResolution}" Width="120"/>
+                </StackPanel>
+
+                <!-- 帧率 -->
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="帧率" />
+                    <ComboBox ItemsSource="{Binding FrameRateOptions}" 
+                              SelectedItem="{Binding SelectedFrameRate}" Width="80"/>
+                </StackPanel>
+
+                <!-- 时长 -->
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="时长 (秒)" />
+                    <NumericUpDown Minimum="1" Maximum="3600" 
+                                   Value="{Binding VideoDuration}" Width="100"/>
+                </StackPanel>
+
+                <!-- 输出精度 -->
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="输出精度" />
+                    <ComboBox ItemsSource="{Binding PresetOptions}" 
+                              SelectedItem="{Binding SelectedPreset}" Width="120"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- 导出按钮 -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="导出视频" Command="{Binding ExportCommentsCommand}" />
+            </StackPanel>
+
         </StackPanel>
     </Grid>
 </UserControl>

@@ -21,14 +21,14 @@
         </TabItem>
 
         <!-- 评论过滤 -->
-        <TabItem Header="评论过滤">
-            <views:FilterView DataContext="{Binding Filter}" />
+        <TabItem Header="软件配置">
+            <views:ConfigView DataContext="{Binding Config}" />
         </TabItem>
 
 
         <!-- 生成设置 -->
-        <TabItem Header="生成设置">
-            <views:GenerateView DataContext="{Binding Generate}" />
+        <TabItem Header="文本设置">
+            <views:TextSettingsView DataContext="{Binding TextSettings}" />
         </TabItem>
 
         <!-- 结果 -->

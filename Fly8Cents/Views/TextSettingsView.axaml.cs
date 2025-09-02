@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace Fly8Cents.Views;
 
-public partial class FilterView : UserControl
+public partial class TextSettingsView : UserControl
 {
-    public FilterView()
+    public TextSettingsView()
     {
         InitializeComponent();
     }

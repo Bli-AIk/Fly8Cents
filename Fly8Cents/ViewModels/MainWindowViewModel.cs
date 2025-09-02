@@ -15,8 +15,8 @@ public class MainWindowViewModel : ViewModelBase
         BasicInfo = new BasicInfoViewModel(HttpClient);
     }
 
-    public FilterViewModel Filter { get; } = new();
-    public GenerateViewModel Generate { get; } = new();
+    public ConfigViewModel Config { get; } = new();
+    public TextSettingsViewModel TextSettings { get; } = new();
     public ExportViewModel Export { get; } = new();
 
     private HttpClient HttpClient { get; }
