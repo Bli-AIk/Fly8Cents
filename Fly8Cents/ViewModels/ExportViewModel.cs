@@ -50,7 +50,7 @@ public class ExportViewModel : ReactiveObject
                 const string ffmpegPath = "ffmpeg";
 
                 var arguments = VideoGenerateService.GetVideoArguments("SourceHanSansCN-Normal.otf", "crawl_text.txt",
-                    "/home/aik/Temps/star_wars_crawl.mp4");
+                    "/home/aik/Temps/star_wars_crawl.mp4", "ultrafast");
 
                 await VideoGenerateService.RunFfmpegAsync(ffmpegPath, arguments);
                 Console.WriteLine("FFmpeg process completed successfully.");

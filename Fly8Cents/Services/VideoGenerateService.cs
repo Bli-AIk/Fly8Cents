@@ -7,7 +7,7 @@ namespace Fly8Cents.Services;
 
 public static class VideoGenerateService
 {
-    public static string GetVideoArguments(string fontPath, string textFile, string outputPath)
+    public static string GetVideoArguments(string fontPath, string textFile, string outputPath, string preset)
     {
         var fullFontPath = $"{Environment.CurrentDirectory.Replace("\\", "/")}/{fontPath}";
         var fullTextFile = Environment.CurrentDirectory.Replace("\\", "/") + $"/{textFile}";
@@ -22,7 +22,7 @@ public static class VideoGenerateService
             .Append("perspective=1050:570:2790:570:-1800:H:W+1800:H:sense=destination,")
             .Append("drawbox=0:0:3840:216:t=fill,")
             .Append("drawbox=0:2160-216:3840:216:t=fill ")
-            .Append("-preset ultrafast ")
+            .Append($"-preset {preset} ")
             .Append("-crf 23 ")
             .Append("-t 10 ")
             .Append(outputPath)
