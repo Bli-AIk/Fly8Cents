@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Reactive;
+using System.Threading.Tasks;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Fly8Cents.Services;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using QuickType.Buvid3.UserSpaceDetails;
 using ReactiveUI;
@@ -16,45 +19,60 @@ public class BasicInfoViewModel : ViewModelBase
 
     private DateTimeOffset _startDate = DateTimeOffset.Now.AddDays(-7);
     private string _uid = "1424609716";
-    
-    private string _uploaderAvatarUrl = "";
 
-    private string _uploaderNickname = "";
+    private Bitmap _uploaderAvatar;
+
+    private string _uploaderNickname = "请输入文本";
 
     public BasicInfoViewModel(HttpClient httpClient)
     {
+        _uploaderAvatar = GetDefaultBitmap();
         CheckUid = ReactiveCommand.CreateFromTask(async () =>
         {
-            var wbiService = new BiliWbiService();
-            var signedParams = await wbiService.SignAsync(new Dictionary<string, string>
+            try
             {
-                { "mid", _uid }
-            });
+                var wbiService = new BiliWbiService();
+                var signedParams = await wbiService.SignAsync(new Dictionary<string, string>
+                {
+                    { "mid", _uid }
+                });
 
-            var query = await new FormUrlEncodedContent(signedParams).ReadAsStringAsync();
+                var query = await new FormUrlEncodedContent(signedParams).ReadAsStringAsync();
 
-            var requestUri = $"https://api.bilibili.com/x/space/wbi/acc/info?{query}";
-            var response = await httpClient.GetStringAsync(
-                requestUri
+                var requestUri = $"https://api.bilibili.com/x/space/wbi/acc/info?{query}";
+                var response = await httpClient.GetStringAsync(
+                    requestUri
                 );
-            Console.WriteLine(httpClient.DefaultRequestHeaders);
-            Console.WriteLine(requestUri);
-            Console.WriteLine("RES\n\n"+response);
-            
-            var obj = JObject.Parse(response);
+                Console.WriteLine(httpClient.DefaultRequestHeaders);
+                Console.WriteLine(requestUri);
+                Console.WriteLine("RES\n\n" + response);
 
-            var code = (int)(obj["code"] ?? throw new InvalidOperationException());
+                var obj = JObject.Parse(response);
 
-            if (code == -352)
-            {
-                Console.WriteLine("风控校验失败");
-                return;
+                var code = (int)(obj["code"] ?? throw new InvalidOperationException());
+
+                if (code == -352)
+                {
+                    Console.WriteLine("风控校验失败");
+                    UploaderNickname = "风控校验失败，请登录后重试";
+                    _uploaderAvatar = GetDefaultBitmap();
+                    return;
+                }
+
+                var data = UserSpaceDetailsData.FromJson(response);
+                UploaderNickname = data.Data.Name;
+                UploaderAvatar = await SetImageFromUrl(data.Data.Face);
             }
-
-            var data = UserSpaceDetailsData.FromJson(response);
-            UploaderNickname = data.Data.Name;
-            UploaderAvatarUrl = data.Data.Face.ToString();
+            catch (Exception e)
+            {
+                Console.WriteLine($"CheckUid报错：{e}");
+            }
         });
+    }
+
+    private static Bitmap GetDefaultBitmap()
+    {
+        return new Bitmap(AssetLoader.Open(new Uri("avares://Fly8Cents/Assets/default.jpg")));
     }
 
     public string Uid
@@ -77,15 +95,24 @@ public class BasicInfoViewModel : ViewModelBase
 
     public ReactiveCommand<Unit, Unit> CheckUid { get; }
 
-    public string UploaderAvatarUrl
+    public Bitmap UploaderAvatar
     {
-        get => _uploaderAvatarUrl;
-        set => this.RaiseAndSetIfChanged(ref _uploaderAvatarUrl, value);
+        get => _uploaderAvatar;
+        set => this.RaiseAndSetIfChanged(ref _uploaderAvatar, value);
     }
 
     public string UploaderNickname
     {
         get => _uploaderNickname;
         set => this.RaiseAndSetIfChanged(ref _uploaderNickname, value);
+    }
+
+    private static async Task<Bitmap> SetImageFromUrl(Uri url)
+    {
+        using var httpClient = new HttpClient();
+        var bytes = await httpClient.GetByteArrayAsync(url);
+        using var stream = new MemoryStream(bytes);
+        var bitmap = new Bitmap(stream);
+        return bitmap;
     }
 }

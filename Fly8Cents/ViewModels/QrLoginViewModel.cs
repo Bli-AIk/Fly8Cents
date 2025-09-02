@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Reactive;
 using System.Threading.Tasks;
@@ -61,10 +62,22 @@ public class QrLoginViewModel : ViewModelBase
                                 continue;
                             case 0:
                                 HelpInfo = "已登录。";
-                                var sessData = GetSessData(generateResponse);
-                                var buvid3 = await GetBuvid3(httpClient);
-                                httpClient.DefaultRequestHeaders.Clear();
-                                httpClient.DefaultRequestHeaders.Add("Cookie", $"SESSDATA={sessData}; buvid3={buvid3}");
+
+                                var cookieContainer = new CookieContainer();
+
+                                var baseUri = new Uri("https://www.bilibili.com");
+                                cookieContainer.Add(baseUri, new Cookie("DedeUserID", GetCookieFromQr(generateResponse, "DedeUserID")));
+                                cookieContainer.Add(baseUri, new Cookie("DedeUserID__ckMd5", GetCookieFromQr(generateResponse, "DedeUserID__ckMd5")));
+                                cookieContainer.Add(baseUri, new Cookie("SESSDATA", GetCookieFromQr(generateResponse, "SESSDATA")));
+                                cookieContainer.Add(baseUri, new Cookie("bili_jct", GetCookieFromQr(generateResponse, "bili_jct")));
+                                cookieContainer.Add(baseUri, new Cookie("buvid3", await GetBuvid3(httpClient)));
+                                
+                                var handler = new HttpClientHandler
+                                {
+                                    CookieContainer = cookieContainer
+                                };
+                                httpClient = MainWindowViewModel.GetHttpClient(handler);
+                                
                                 break;
                             default:
                                 HelpInfo = "扫描失败，请重试。";
@@ -94,7 +107,7 @@ public class QrLoginViewModel : ViewModelBase
         return buvid3;
     }
 
-    private static string GetSessData(HttpResponseMessage cookieResponse)
+    private static string GetCookieFromQr(HttpResponseMessage cookieResponse, string name)
     {
         if (!cookieResponse.Headers.TryGetValues("Set-Cookie", out var cookies))
         {
@@ -103,17 +116,17 @@ public class QrLoginViewModel : ViewModelBase
 
         foreach (var cookie in cookies)
         {
-            if (!cookie.StartsWith("SESSDATA="))
+            if (!cookie.StartsWith($"{name}="))
             {
                 continue;
             }
 
-            var sessData = cookie.Split(';')[0].Split('=')[1];
-            Console.WriteLine($"SESSDATA: {sessData}");
-            return sessData;
+            var value = cookie.Split(';')[0].Split('=')[1];
+            Console.WriteLine($"{name}: {value}");
+            return value;
         }
 
-        throw new KeyNotFoundException("SESSDATA cookie was not found in response.");
+        throw new KeyNotFoundException($"{name} cookie was not found in response.");
     }
 
     public string HelpInfo
