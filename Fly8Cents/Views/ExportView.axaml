@@ -63,7 +63,9 @@
 
             <!-- 导出按钮 -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="导出视频" Command="{Binding ExportCommentsCommand}" />
+                <Button Content="读取文本" Command="{Binding LoadTextCommand}" Margin="5,0"/>
+                <Button Content="保存文本" Command="{Binding SaveTextCommand}" Margin="5,0"/>
+                <Button Content="保存文本并导出视频" Command="{Binding ExportCommentsCommand}" />
             </StackPanel>
 
         </StackPanel>

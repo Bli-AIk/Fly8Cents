@@ -1,21 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reactive;
+using System.Reflection;
 using System.Threading.Tasks;
 using Fly8Cents.Models;
 using Fly8Cents.Services;
 using QuickType.VideoKeywordQuery;
 using ReactiveUI;
-using static System.Text.RegularExpressions.Regex;
 
 namespace Fly8Cents.ViewModels;
 
 public class ExportViewModel : ReactiveObject
 {
-    private static readonly Random Random = new();
     private string _commentsText = "";
     private ConfigModel _config = new();
     private string _consoleOutput = "";
@@ -120,7 +120,7 @@ public class ExportViewModel : ReactiveObject
                                 continue;
                             }
 
-                            message = ProcessBilibiliEmoticon(message);
+                            message = EmoticonHelper.ProcessBilibiliEmoticon(message);
 
                             var dateTime = DateTimeOffset.FromUnixTimeSeconds(reply.Ctime);
                             var dateText = dateTime.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
@@ -144,18 +144,78 @@ public class ExportViewModel : ReactiveObject
             catch (Exception ex)
             {
                 var format = $"爬取评论时出错: {ex.Message}\n";
-                Console.WriteLine(format);
-                ConsoleOutput += format;
+                ConsoleWriteLine(format);
+            }
+        });
+        
+        LoadTextCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            try
+            {
+                var assemblyPath = Assembly.GetExecutingAssembly().Location;
+                if (string.IsNullOrEmpty(assemblyPath))
+                {
+                    throw new InvalidOperationException("无法获取程序集路径。");
+                }
+
+                var appDirectory = Path.GetDirectoryName(assemblyPath);
+                if (appDirectory == null)
+                {
+                    throw new InvalidOperationException("无法获取程序目录。");
+                }
+
+                var filePath = Path.Combine(appDirectory, "Comments.txt");
+
+                if (File.Exists(filePath))
+                {
+                    CommentsText = await File.ReadAllTextAsync(filePath);
+                }
+                else
+                {
+                    ConsoleWriteLine($"未找到 {filePath} 对应的文件。");
+                    CommentsText = string.Empty;
+                }
+            }
+            catch (Exception ex)
+            {
+                ConsoleWriteLine($"加载文件失败：{ex}");
+                CommentsText = string.Empty; 
             }
         });
 
-        // 导出命令（具体实现留空）
+        SaveTextCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            try
+            {
+                var assemblyPath = Assembly.GetExecutingAssembly().Location;
+                if (string.IsNullOrEmpty(assemblyPath))
+                {
+                    throw new InvalidOperationException("无法获取程序集路径。");
+                }
+
+                var appDirectory = Path.GetDirectoryName(assemblyPath);
+                if (appDirectory == null)
+                {
+                    throw new InvalidOperationException("无法获取程序目录。");
+                }
+
+                var filePath = Path.Combine(appDirectory, "Comments.txt");
+
+                await File.WriteAllTextAsync(filePath, CommentsText);
+            }
+            catch (Exception ex)
+            {
+                ConsoleWriteLine($"保存文件失败：{ex}");
+            }
+        });
+
+
         ExportCommentsCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             try
             {
-                Console.WriteLine("Starting FFmpeg process...");
-                Console.WriteLine($"Working Directory: {Environment.CurrentDirectory}");
+                ConsoleWriteLine("启动FFMPEG进程……");
+                ConsoleWriteLine($"工作目录：{Environment.CurrentDirectory}");
 
                 const string ffmpegPath = "ffmpeg";
 
@@ -163,11 +223,11 @@ public class ExportViewModel : ReactiveObject
                     "/home/aik/Temps/star_wars_crawl.mp4", "ultrafast");
 
                 await VideoGenerateService.RunFfmpegAsync(ffmpegPath, arguments);
-                Console.WriteLine("FFmpeg process completed successfully.");
+                ConsoleWriteLine("FFMPEG进程成功完成。");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred during FFmpeg execution: {ex.Message}");
+                ConsoleWriteLine($"An error occurred during FFmpeg execution: {ex.Message}");
             }
         });
 
@@ -222,7 +282,7 @@ public class ExportViewModel : ReactiveObject
             {
                 if (!string.IsNullOrWhiteSpace(line))
                 {
-                    Console.WriteLine(line);
+                    ConsoleWriteLine(line);
                 }
             }
 
@@ -277,29 +337,13 @@ public class ExportViewModel : ReactiveObject
 
     // Commands
     public ReactiveCommand<Unit, Unit> FetchCommentsCommand { get; }
+    public ReactiveCommand<Unit, Unit> LoadTextCommand { get; }
+    public ReactiveCommand<Unit, Unit> SaveTextCommand { get; }
     public ReactiveCommand<Unit, Unit> ExportCommentsCommand { get; }
 
-    /// <summary>
-    /// [汤圆] -75%> (还有个汤圆)
-    /// </summary>
-    private static string ProcessBilibiliEmoticon(string input)
+    private void ConsoleWriteLine(string format)
     {
-        if (string.IsNullOrEmpty(input))
-        {
-            return input;
-        }
-
-        // 匹配形如 [xxx] 的内容
-        var matches = Matches(input, @"\[(.+?)\]");
-
-        if (matches.Count != 1)
-        {
-            return input;
-        }
-
-        var innerText = matches[0].Groups[1].Value;
-
-        return Random.NextDouble() < 0.75 ? Replace(input, @"\[(.+?)\]", $"(还有个{innerText})") :
-            input;
+        Console.WriteLine(format);
+        ConsoleOutput += format;
     }
 }

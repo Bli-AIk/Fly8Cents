@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,8 +10,8 @@ public static class VideoGenerateService
 {
     public static string GetVideoArguments(string fontPath, string textFile, string outputPath, string preset)
     {
-        var fullFontPath = $"{Environment.CurrentDirectory.Replace("\\", "/")}/{fontPath}";
-        var fullTextFile = Environment.CurrentDirectory.Replace("\\", "/") + $"/{textFile}";
+        var fullFontPath = $"{Assembly.GetExecutingAssembly().Location}/{fontPath}";
+        var fullTextFile = $"{Assembly.GetExecutingAssembly().Location}/{textFile}";
 
         // For ffmpeg
         var arguments = new StringBuilder().Append("-f lavfi -i nullsrc=s=3840x2160 -vf ")
