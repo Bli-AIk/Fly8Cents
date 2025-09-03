@@ -9,12 +9,15 @@ using Fly8Cents.Models;
 using Fly8Cents.Services;
 using QuickType.VideoKeywordQuery;
 using ReactiveUI;
+using static System.Text.RegularExpressions.Regex;
 
 namespace Fly8Cents.ViewModels;
 
 public class ExportViewModel : ReactiveObject
 {
+    private static readonly Random Random = new();
     private string _commentsText = "";
+    private ConfigModel _config = new();
     private string _consoleOutput = "";
 
     private DateTimeOffset _endDate = DateTimeOffset.Now;
@@ -33,6 +36,8 @@ public class ExportViewModel : ReactiveObject
     {
         MessageBus.Current.Listen<UploaderInfoModel>()
             .Subscribe(uploader => { Uploader = uploader; });
+        MessageBus.Current.Listen<ConfigModel>()
+            .Subscribe(config => { Config = config; });
         MessageBus.Current.Listen<DateTimeOffset>("StartDate")
             .Subscribe(startDate => { StartDate = startDate; });
         MessageBus.Current.Listen<DateTimeOffset>("EndDate")
@@ -101,9 +106,25 @@ public class ExportViewModel : ReactiveObject
                                 continue;
                             }
 
+                            var message = reply.Content.Message;
+
+                            var hasBlacklistedWord =
+                                Config.BlackList.Any(blacklistedWord => message.Contains(blacklistedWord));
+
+                            var hasWhitelistedWord =
+                                Config.WhiteList.Any(whitelistedWord => message.Contains(whitelistedWord));
+
+                            if ((Config.BlackList.Count > 0 && hasBlacklistedWord) ||
+                                (Config.WhiteList.Count > 0 && !hasWhitelistedWord))
+                            {
+                                continue;
+                            }
+
+                            message = ProcessBilibiliEmoticon(message);
+
                             var dateTime = DateTimeOffset.FromUnixTimeSeconds(reply.Ctime);
                             var dateText = dateTime.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
-                            CommentsText += $"{dateText}\nid: {reply.Member.Uname}\n{reply.Content.Message}\n\n";
+                            CommentsText += $"{dateText}\nid: {reply.Member.Uname}\n{message}\n\n";
                             await Task.Delay(500);
                         }
 
@@ -161,13 +182,13 @@ public class ExportViewModel : ReactiveObject
         SelectedPreset = PresetOptions[2];
     }
 
-    public DateTimeOffset StartDate
+    private DateTimeOffset StartDate
     {
         get => _startDate;
         set => this.RaiseAndSetIfChanged(ref _startDate, value);
     }
 
-    public DateTimeOffset EndDate
+    private DateTimeOffset EndDate
     {
         get => _endDate;
         set => this.RaiseAndSetIfChanged(ref _endDate, value);
@@ -177,6 +198,12 @@ public class ExportViewModel : ReactiveObject
     {
         get => _uploader;
         set => this.RaiseAndSetIfChanged(ref _uploader, value);
+    }
+
+    private ConfigModel Config
+    {
+        get => _config;
+        set => this.RaiseAndSetIfChanged(ref _config, value);
     }
 
     public string ConsoleOutput
@@ -251,4 +278,28 @@ public class ExportViewModel : ReactiveObject
     // Commands
     public ReactiveCommand<Unit, Unit> FetchCommentsCommand { get; }
     public ReactiveCommand<Unit, Unit> ExportCommentsCommand { get; }
+
+    /// <summary>
+    /// [汤圆] -75%> (还有个汤圆)
+    /// </summary>
+    private static string ProcessBilibiliEmoticon(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return input;
+        }
+
+        // 匹配形如 [xxx] 的内容
+        var matches = Matches(input, @"\[(.+?)\]");
+
+        if (matches.Count != 1)
+        {
+            return input;
+        }
+
+        var innerText = matches[0].Groups[1].Value;
+
+        return Random.NextDouble() < 0.75 ? Replace(input, @"\[(.+?)\]", $"(还有个{innerText})") :
+            input;
+    }
 }

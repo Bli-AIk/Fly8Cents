@@ -1,99 +1,89 @@
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Reactive;
+using Fly8Cents.Models;
 using ReactiveUI;
 
 namespace Fly8Cents.ViewModels;
 
 public class ConfigViewModel : ViewModelBase
 {
-    private ObservableCollection<string> _blackList = [];
+    private ConfigModel _config = new();
 
     private string _newBlackItem = "";
-
     private string _newWhiteItem = "";
     private string? _selectedBlackItem;
     private string? _selectedWhiteItem;
-
-    private ObservableCollection<string> _whiteList = [];
 
     public ConfigViewModel()
     {
         AddBlackCommand = ReactiveCommand.Create(() =>
         {
-            if (string.IsNullOrWhiteSpace(NewBlackItem))
+            if (string.IsNullOrWhiteSpace(NewBlackItem) || Config.BlackList.Contains(NewBlackItem))
             {
                 return;
             }
 
-            if (BlackList.Any(item => item == NewWhiteItem))
-            {
-                return;
-            }
-
-            BlackList.Add(NewBlackItem);
+            Config.BlackList.Add(NewBlackItem);
             NewBlackItem = "";
+            MessageBus.Current.SendMessage(Config);
         });
 
         RemoveBlackCommand = ReactiveCommand.Create(() =>
         {
-            if (!string.IsNullOrWhiteSpace(SelectedBlackItem))
+            if (string.IsNullOrWhiteSpace(SelectedBlackItem))
             {
-                BlackList.Remove(SelectedBlackItem);
+                return;
             }
+
+            Config.BlackList.Remove(SelectedBlackItem);
+            MessageBus.Current.SendMessage(Config);
         });
 
         ClearBlackCommand = ReactiveCommand.Create(() =>
         {
-            BlackList.Clear();
+            Config.BlackList.Clear();
+            MessageBus.Current.SendMessage(Config);
         });
-        
+
         AddWhiteCommand = ReactiveCommand.Create(() =>
         {
-            if (string.IsNullOrWhiteSpace(NewWhiteItem))
+            if (string.IsNullOrWhiteSpace(NewWhiteItem) || Config.WhiteList.Contains(NewWhiteItem))
             {
                 return;
             }
 
-            if (WhiteList.Any(item => item == NewWhiteItem))
-            {
-                return;
-            }
-
-            WhiteList.Add(NewWhiteItem);
+            Config.WhiteList.Add(NewWhiteItem);
             NewWhiteItem = "";
+            MessageBus.Current.SendMessage(Config);
         });
 
         RemoveWhiteCommand = ReactiveCommand.Create(() =>
         {
-            if (!string.IsNullOrWhiteSpace(SelectedWhiteItem))
+            if (string.IsNullOrWhiteSpace(SelectedWhiteItem))
             {
-                WhiteList.Remove(SelectedWhiteItem);
+                return;
             }
+
+            Config.WhiteList.Remove(SelectedWhiteItem);
+            MessageBus.Current.SendMessage(Config);
         });
-        
+
         ClearWhiteCommand = ReactiveCommand.Create(() =>
         {
-            WhiteList.Clear();
+            Config.WhiteList.Clear();
+            MessageBus.Current.SendMessage(Config);
         });
     }
 
-    public ObservableCollection<string> BlackList
+    public ConfigModel Config
     {
-        get => _blackList;
-        set => this.RaiseAndSetIfChanged(ref _blackList, value);
+        get => _config;
+        set => this.RaiseAndSetIfChanged(ref _config, value);
     }
 
     public string NewBlackItem
     {
         get => _newBlackItem;
         set => this.RaiseAndSetIfChanged(ref _newBlackItem, value);
-    }
-
-    public ObservableCollection<string> WhiteList
-    {
-        get => _whiteList;
-        set => this.RaiseAndSetIfChanged(ref _whiteList, value);
     }
 
     public string NewWhiteItem
@@ -114,20 +104,6 @@ public class ConfigViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _selectedBlackItem, value);
     }
 
-    private bool _isWhiteHomonym;
-    public bool IsWhiteHomonym
-    {
-        get => _isWhiteHomonym;
-        set => this.RaiseAndSetIfChanged(ref _isWhiteHomonym, value);
-    }
-
-    private bool _isBlackHomonym;
-    public bool IsBlackHomonym
-    {
-        get => _isBlackHomonym;
-        set => this.RaiseAndSetIfChanged(ref _isBlackHomonym, value);
-    }
-    
     public ReactiveCommand<Unit, Unit> AddBlackCommand { get; }
     public ReactiveCommand<Unit, Unit> RemoveBlackCommand { get; }
     public ReactiveCommand<Unit, Unit> ClearBlackCommand { get; }
