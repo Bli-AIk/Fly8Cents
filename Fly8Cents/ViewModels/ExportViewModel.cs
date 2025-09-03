@@ -109,11 +109,17 @@ public class ExportViewModel : ReactiveObject
 
                             var message = reply.Content.Message;
 
-                            var hasBlacklistedWord =
-                                Config.BlackList.Any(blacklistedWord => message.Contains(blacklistedWord));
+                            var hasBlacklistedWord = Config.BlackList.Any(blacklistedWord =>
+                                (!Config.IsBlackHomonym && message.Contains(blacklistedWord)) ||
+                                (Config.IsBlackHomonym &&
+                                 HomophoneChecker.HasHomophone(message,
+                                     blacklistedWord)));
 
-                            var hasWhitelistedWord =
-                                Config.WhiteList.Any(whitelistedWord => message.Contains(whitelistedWord));
+                            var hasWhitelistedWord = Config.WhiteList.Any(whitelistedWord =>
+                                (!Config.IsWhiteHomonym && message.Contains(whitelistedWord)) ||
+                                (Config.IsWhiteHomonym &&
+                                 HomophoneChecker.HasHomophone(message,
+                                     whitelistedWord)));
 
                             if ((Config.BlackList.Count > 0 && hasBlacklistedWord) ||
                                 (Config.WhiteList.Count > 0 && !hasWhitelistedWord))

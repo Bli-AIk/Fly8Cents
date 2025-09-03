@@ -24,6 +24,7 @@
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="hyjiacan.pinyin4net" Version="4.1.1" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0-preview.7.25380.108"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4-beta1"/>
         <PackageReference Include="ReactiveUI" Version="20.4.1"/>
