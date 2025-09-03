@@ -6,7 +6,7 @@
 //
 //    var qrResponseData = QrResponseData.FromJson(jsonString);
 
-namespace QuickType.Buvid3.UserSpaceDetails.QrResponse
+namespace QuickType.LazyComment.Buvid3.UserSpaceDetails.QrResponse
 {
     using System;
     using System.Collections.Generic;

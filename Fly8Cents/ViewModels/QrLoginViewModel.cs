@@ -4,9 +4,9 @@ using System.Net;
 using System.Net.Http;
 using System.Reactive;
 using System.Threading.Tasks;
-using QuickType.Buvid3;
-using QuickType.Buvid3.UserSpaceDetails.QrResponse;
-using QuickType.Buvid3.UserSpaceDetails.QrResponse.QrRequest;
+using QuickType.LazyComment.Buvid3;
+using QuickType.LazyComment.Buvid3.UserSpaceDetails.QrResponse;
+using QuickType.LazyComment.Buvid3.UserSpaceDetails.QrResponse.QrRequest;
 using ReactiveUI;
 
 // 假设 QrRequestData 在这里

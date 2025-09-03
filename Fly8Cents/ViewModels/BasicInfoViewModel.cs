@@ -8,7 +8,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Fly8Cents.Services;
 using Newtonsoft.Json.Linq;
-using QuickType.Buvid3.UserSpaceDetails;
+using QuickType.LazyComment.Buvid3.UserSpaceDetails;
 using ReactiveUI;
 
 namespace Fly8Cents.ViewModels;
@@ -31,36 +31,17 @@ public class BasicInfoViewModel : ViewModelBase
         {
             try
             {
-                var wbiService = new BiliWbiService();
-                var signedParams = await wbiService.SignAsync(new Dictionary<string, string>
+                var data = await BiliService.GetUserSpaceDetailsData(httpClient, _uid);
+                if (data != null)
                 {
-                    { "mid", _uid }
-                });
-
-                var query = await new FormUrlEncodedContent(signedParams).ReadAsStringAsync();
-
-                var requestUri = $"https://api.bilibili.com/x/space/wbi/acc/info?{query}";
-                var response = await httpClient.GetStringAsync(
-                    requestUri
-                );
-                Console.WriteLine(httpClient.DefaultRequestHeaders);
-                Console.WriteLine(requestUri);
-
-                var obj = JObject.Parse(response);
-
-                var code = (int)(obj["code"] ?? throw new InvalidOperationException());
-
-                if (code == -352)
-                {
-                    Console.WriteLine("风控校验失败");
-                    UploaderNickname = "风控校验失败，请登录后重试";
-                    _uploaderAvatar = GetDefaultBitmap();
-                    return;
+                    UploaderNickname = data.Data.Name;
+                    UploaderAvatar = await SetImageFromUrl(data.Data.Face);
                 }
-
-                var data = UserSpaceDetailsData.FromJson(response);
-                UploaderNickname = data.Data.Name;
-                UploaderAvatar = await SetImageFromUrl(data.Data.Face);
+                else
+                {
+                    UploaderNickname = "风控校验失败，请登录后重试";
+                    UploaderAvatar = GetDefaultBitmap();
+                }
             }
             catch (Exception e)
             {
