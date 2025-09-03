@@ -4,9 +4,9 @@
 //
 //    using QuickType;
 //
-//    var qrResponseData = QrResponseData.FromJson(jsonString);
+//    var videoKeywordQueryData = VideoKeywordQueryData.FromJson(jsonString);
 
-namespace QuickType.QrResponse
+namespace QuickType.VideoKeywordQuery
 {
     using System;
     using System.Collections.Generic;
@@ -15,7 +15,7 @@ namespace QuickType.QrResponse
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
 
-    public partial class QrResponseData
+    public partial class VideoKeywordQueryData
     {
         [JsonProperty("code")]
         public long Code { get; set; }
@@ -33,30 +33,84 @@ namespace QuickType.QrResponse
 
     public partial class Data
     {
-        [JsonProperty("url")]
-        public string Url { get; set; }
+        [JsonProperty("archives")]
+        public Archive[] Archives { get; set; }
 
-        [JsonProperty("refresh_token")]
-        public string RefreshToken { get; set; }
-
-        [JsonProperty("timestamp")]
-        public long Timestamp { get; set; }
-
-        [JsonProperty("code")]
-        public long Code { get; set; }
-
-        [JsonProperty("message")]
-        public string Message { get; set; }
+        [JsonProperty("page")]
+        public Page Page { get; set; }
     }
 
-    public partial class QrResponseData
+    public partial class Archive
     {
-        public static QrResponseData FromJson(string json) => JsonConvert.DeserializeObject<QrResponseData>(json, Converter.Settings);
+        [JsonProperty("aid")]
+        public long Aid { get; set; }
+
+        [JsonProperty("title")]
+        public string Title { get; set; }
+
+        [JsonProperty("pubdate")]
+        public long Pubdate { get; set; }
+
+        [JsonProperty("ctime")]
+        public long Ctime { get; set; }
+
+        [JsonProperty("state")]
+        public long State { get; set; }
+
+        [JsonProperty("pic")]
+        public Uri Pic { get; set; }
+
+        [JsonProperty("duration")]
+        public long Duration { get; set; }
+
+        [JsonProperty("stat")]
+        public Stat Stat { get; set; }
+
+        [JsonProperty("bvid")]
+        public string Bvid { get; set; }
+
+        [JsonProperty("ugc_pay")]
+        public long UgcPay { get; set; }
+
+        [JsonProperty("interactive_video")]
+        public bool InteractiveVideo { get; set; }
+
+        [JsonProperty("enable_vt")]
+        public long EnableVt { get; set; }
+
+        [JsonProperty("vt_display")]
+        public string VtDisplay { get; set; }
+
+        [JsonProperty("playback_position")]
+        public long PlaybackPosition { get; set; }
+    }
+
+    public partial class Stat
+    {
+        [JsonProperty("view")]
+        public long View { get; set; }
+    }
+
+    public partial class Page
+    {
+        [JsonProperty("num")]
+        public long Num { get; set; }
+
+        [JsonProperty("size")]
+        public long Size { get; set; }
+
+        [JsonProperty("total")]
+        public long Total { get; set; }
+    }
+
+    public partial class VideoKeywordQueryData
+    {
+        public static VideoKeywordQueryData FromJson(string json) => JsonConvert.DeserializeObject<VideoKeywordQueryData>(json, QuickType.VideoKeywordQuery.Converter.Settings);
     }
 
     public static class Serialize
     {
-        public static string ToJson(this QrResponseData self) => JsonConvert.SerializeObject(self, Converter.Settings);
+        public static string ToJson(this VideoKeywordQueryData self) => JsonConvert.SerializeObject(self, QuickType.VideoKeywordQuery.Converter.Settings);
     }
 
     internal static class Converter

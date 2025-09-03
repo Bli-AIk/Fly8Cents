@@ -8,7 +8,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Fly8Cents.Services;
 using Newtonsoft.Json.Linq;
-using QuickType.LazyComment.Buvid3.UserSpaceDetails;
+using QuickType.UserSpaceDetails;
 using ReactiveUI;
 
 namespace Fly8Cents.ViewModels;
@@ -18,7 +18,7 @@ public class BasicInfoViewModel : ViewModelBase
     private DateTimeOffset _endDate = DateTimeOffset.Now;
 
     private DateTimeOffset _startDate = DateTimeOffset.Now.AddDays(-7);
-    private string _uid = "1424609716";
+    private long _uid = 1424609716;
 
     private Bitmap _uploaderAvatar;
 
@@ -50,7 +50,7 @@ public class BasicInfoViewModel : ViewModelBase
         });
     }
 
-    public string Uid
+    public long Uid
     {
         get => _uid;
         set => this.RaiseAndSetIfChanged(ref _uid, value);

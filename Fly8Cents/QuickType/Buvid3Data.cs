@@ -6,7 +6,7 @@
 //
 //    var buvid3Data = Buvid3Data.FromJson(jsonString);
 
-namespace QuickType.LazyComment.Buvid3
+namespace QuickType.Buvid3
 {
     using System;
     using System.Collections.Generic;

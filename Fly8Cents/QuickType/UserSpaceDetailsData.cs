@@ -6,7 +6,7 @@
 //
 //    var userSpaceDetailsData = UserSpaceDetailsData.FromJson(jsonString);
 
-namespace QuickType.LazyComment.Buvid3.UserSpaceDetails
+namespace QuickType.UserSpaceDetails
 {
     using System;
     using System.Collections.Generic;

@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using QuickType.LazyComment;
-using QuickType.LazyComment.Buvid3.UserSpaceDetails;
+using QuickType.UserSpaceDetails;
 
 namespace Fly8Cents.Services;
 
