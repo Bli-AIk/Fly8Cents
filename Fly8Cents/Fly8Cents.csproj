@@ -43,7 +43,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="Assets\Fonts\SourceHanSansCN-Normal.otf">
+        <None Include="Assets\Fonts\Font.otf">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>

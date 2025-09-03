@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Fly8Cents.Models;
@@ -169,6 +170,7 @@ public class ExportViewModel : ReactiveObject
                 if (File.Exists(filePath))
                 {
                     CommentsText = await File.ReadAllTextAsync(filePath);
+                    ConsoleWriteLine("文本已加载");
                 }
                 else
                 {
@@ -202,6 +204,7 @@ public class ExportViewModel : ReactiveObject
                 var filePath = Path.Combine(appDirectory, "Comments.txt");
 
                 await File.WriteAllTextAsync(filePath, CommentsText);
+                ConsoleWriteLine("文本已保存");
             }
             catch (Exception ex)
             {
@@ -214,12 +217,21 @@ public class ExportViewModel : ReactiveObject
         {
             try
             {
+                if (string.IsNullOrEmpty(CommentsText))
+                {
+                    ConsoleWriteLine("请在导出前输入文本。");
+                    return;
+                }
+                
+                await SaveTextCommand.Execute();
+                
                 ConsoleWriteLine("启动FFMPEG进程……");
                 ConsoleWriteLine($"工作目录：{Environment.CurrentDirectory}");
 
                 const string ffmpegPath = "ffmpeg";
 
-                var arguments = VideoGenerateService.GetVideoArguments(SelectedResolution, SelectedPreset);
+                var arguments = VideoGenerateService.GetVideoArguments(SelectedResolution, SelectedPreset,
+                    VideoDuration, SelectedFrameRate);
 
                 await VideoGenerateService.RunFfmpegAsync(ffmpegPath, arguments);
                 ConsoleWriteLine("FFMPEG进程成功完成。");
@@ -237,7 +249,7 @@ public class ExportViewModel : ReactiveObject
 
         // 默认值
         SelectedResolution = ResolutionOptions[0];
-        SelectedFrameRate = FrameRateOptions[1];
+        SelectedFrameRate = FrameRateOptions[2];
         SelectedPreset = PresetOptions[2];
     }
 
@@ -343,6 +355,6 @@ public class ExportViewModel : ReactiveObject
     private void ConsoleWriteLine(string format)
     {
         Console.WriteLine(format);
-        ConsoleOutput += format;
+        ConsoleOutput += $"{format}\n";
     }
 }

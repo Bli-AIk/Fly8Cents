@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,34 +9,46 @@ namespace Fly8Cents.Services;
 
 public static class VideoGenerateService
 {
-    public static string GetVideoArguments(string resolution, string preset)
+    public static string GetVideoArguments(string resolution, string preset, double duration, int frameRate)
     {
-        var fullFontPath = $"{Assembly.GetExecutingAssembly().Location}/SourceHanSansCN-Normal.otf";
-        var fullTextFile = $"{Assembly.GetExecutingAssembly().Location}/Comments.txt";
-        var outputPath = $"{Assembly.GetExecutingAssembly().Location}/output.mp4";
+        var exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+       
+        if (exeDir == null)
+        {
+            throw new InvalidOperationException("无法获取当前程序集所在目录。");
+        }
 
-        // For ffmpeg
-        // 标准分辨率为 3840x2160
+        var fullFontPath = Path.Combine(exeDir, "Assets/Fonts/Font.otf");
+        var fullTextFile = Path.Combine(exeDir, "Comments.txt");
+        var outputPath = Path.Combine(exeDir, "output.mp4");
+
         var dimensions = resolution.Split('x');
 
         var width = int.Parse(dimensions[0]);
         var height = int.Parse(dimensions[1]);
 
+        // 根据高度调整字体大小，例如：高度的7%
+        var fontSize = (int)(height * 0.07);
+
+        // FFmpeg
         var arguments = new StringBuilder().Append($"-f lavfi -i nullsrc=s={resolution} -vf ")
             .Append("drawbox=t=fill,")
             .Append($"drawtext={fullFontPath}:")
             .Append($"textfile={fullTextFile}:")
-            .Append("x=(w-text_w)/2:y=h-100*t:fontsize=150:fontcolor=0xb89801,")
+            .Append($"x=(w-text_w)/2:y=h-100*t:fontsize={fontSize}:fontcolor=0xb89801,")
             .Append("drawbox,")
             .Append("perspective=1050:570:2790:570:-1800:H:W+1800:H:sense=destination,")
-            .Append($"drawbox=0:0:{width}:{height * 0.1}:t=fill,") // 使用变量
-            .Append($"drawbox=0:{height - height * 0.1}:{width}:{height * 0.1}:t=fill ") // 使用变量
+            .Append($"drawbox=0:0:{width}:{height * 0.1}:t=fill,")
+            .Append($"drawbox=0:{height - height * 0.1}:{width}:{height * 0.1}:t=fill ")
             .Append($"-preset {preset} ")
             .Append("-crf 23 ")
-            .Append("-t 10 ")
+            .Append($"-t {duration} ")
+            .Append($"-r {frameRate} ")
+            .Append("-y ")
             .Append(outputPath)
             .Append(" -progress pipe:1")
             .ToString();
+
         return arguments;
     }
 
