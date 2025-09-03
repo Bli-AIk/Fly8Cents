@@ -219,8 +219,7 @@ public class ExportViewModel : ReactiveObject
 
                 const string ffmpegPath = "ffmpeg";
 
-                var arguments = VideoGenerateService.GetVideoArguments("SourceHanSansCN-Normal.otf", "crawl_text.txt",
-                    "/home/aik/Temps/star_wars_crawl.mp4", "ultrafast");
+                var arguments = VideoGenerateService.GetVideoArguments(SelectedResolution, SelectedPreset);
 
                 await VideoGenerateService.RunFfmpegAsync(ffmpegPath, arguments);
                 ConsoleWriteLine("FFMPEG进程成功完成。");
@@ -232,7 +231,7 @@ public class ExportViewModel : ReactiveObject
         });
 
         // 初始化视频参数选项
-        ResolutionOptions = ["1920x1080", "1280x720", "854x480"];
+        ResolutionOptions = ["3840x2160", "1920x1080", "1280x720", "854x480"];
         FrameRateOptions = [24, 30, 60];
         PresetOptions = ["ultrafast", "superfast", "veryfast", "slow", "veryslow"];
 

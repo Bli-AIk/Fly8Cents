@@ -41,4 +41,11 @@
         <ProjectReference Include="..\bili-kernel\src\BiliKernel.Grpc\BiliKernel.Grpc.csproj"/>
         <ProjectReference Include="..\bili-kernel\src\Services\Services.User\Services.User.csproj"/>
     </ItemGroup>
+
+    <ItemGroup>
+        <None Include="Assets\Fonts\SourceHanSansCN-Normal.otf">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>
