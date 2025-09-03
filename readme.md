@@ -29,4 +29,4 @@
 欢迎提交 issue 或 PR，让生成器更好用。
 
 ## 许可证
-Apache 2.0
+GPL-3.0 license
