@@ -45,7 +45,6 @@ public class BasicInfoViewModel : ViewModelBase
                 );
                 Console.WriteLine(httpClient.DefaultRequestHeaders);
                 Console.WriteLine(requestUri);
-                Console.WriteLine("RES\n\n" + response);
 
                 var obj = JObject.Parse(response);
 

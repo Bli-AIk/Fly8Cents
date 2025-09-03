@@ -19,13 +19,15 @@
                          Grid.Row="1" Height="150" />
 
                 <StackPanel Orientation="Horizontal" Margin="0,5,0,0" Grid.Row="2">
-                    <TextBox Width="150" Text="{Binding NewBlackItem, Mode=TwoWay}" />
+                    <TextBox Width="125" Text="{Binding NewBlackItem, Mode=TwoWay}" />
                     <Button Content="添加" Margin="5,0"
                             Command="{Binding AddBlackCommand}" />
                     <Button Content="删除" Margin="5,0"
                             Command="{Binding RemoveBlackCommand}" />
                     <Button Content="清空" Margin="5,0"
                             Command="{Binding ClearBlackCommand}" />
+                    <CheckBox Content="同音检查" Margin="5,0"
+                              IsChecked="{Binding IsBlackHomonym, Mode=TwoWay}" />
                 </StackPanel>
             </Grid>
         </Border>
@@ -43,13 +45,15 @@
                          Grid.Row="1" Height="150" />
 
                 <StackPanel Orientation="Horizontal" Margin="0,5,0,0" Grid.Row="2">
-                    <TextBox Width="150" Text="{Binding NewWhiteItem, Mode=TwoWay}" />
+                    <TextBox Width="125" Text="{Binding NewWhiteItem, Mode=TwoWay}" />
                     <Button Content="添加" Margin="5,0"
                             Command="{Binding AddWhiteCommand}" />
                     <Button Content="删除" Margin="5,0"
                             Command="{Binding RemoveWhiteCommand}" />
                     <Button Content="清空" Margin="5,0"
                             Command="{Binding ClearWhiteCommand}" />
+                    <CheckBox Content="同音检查" Margin="5,0"
+                              IsChecked="{Binding IsWhiteHomonym, Mode=TwoWay}" />
                 </StackPanel>
             </Grid>
         </Border>

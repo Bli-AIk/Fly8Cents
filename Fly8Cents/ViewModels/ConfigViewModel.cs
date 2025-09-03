@@ -114,7 +114,20 @@ public class ConfigViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _selectedBlackItem, value);
     }
 
+    private bool _isWhiteHomonym;
+    public bool IsWhiteHomonym
+    {
+        get => _isWhiteHomonym;
+        set => this.RaiseAndSetIfChanged(ref _isWhiteHomonym, value);
+    }
 
+    private bool _isBlackHomonym;
+    public bool IsBlackHomonym
+    {
+        get => _isBlackHomonym;
+        set => this.RaiseAndSetIfChanged(ref _isBlackHomonym, value);
+    }
+    
     public ReactiveCommand<Unit, Unit> AddBlackCommand { get; }
     public ReactiveCommand<Unit, Unit> RemoveBlackCommand { get; }
     public ReactiveCommand<Unit, Unit> ClearBlackCommand { get; }
