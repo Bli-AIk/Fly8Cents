@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Fly8Cents.Services;
 
-public class BiliWbiService
+public static class BiliWbiService
 {
     private static readonly HttpClient HttpClient = new();
 
@@ -69,7 +69,7 @@ public class BiliWbiService
     /// <summary>
     ///     给请求参数添加 WBI 签名
     /// </summary>
-    public async Task<Dictionary<string, string>> SignAsync(Dictionary<string, string> parameters)
+    public static async Task<Dictionary<string, string>> SignAsync(Dictionary<string, string> parameters)
     {
         var (imgKey, subKey) = await GetWbiKeysAsync();
         return EncWbi(parameters, imgKey, subKey);

@@ -138,23 +138,25 @@ public static class BiliService
         string nextOffset,
         int mode = 3)
     {
-        var wbiService = new BiliWbiService();
-        var signedParams = await wbiService.SignAsync(new Dictionary<string, string>
+        var parameters = new Dictionary<string, string>
         {
             { "oid", oid.ToString() },
             { "type", ((int)type).ToString() },
             { "mode", mode.ToString() },
             { "web_location", "1315875" },
             { "plat", "1" }
-        });
+        };
 
-
-        if (!string.IsNullOrEmpty(nextOffset))
+        if (string.IsNullOrEmpty(nextOffset))
         {
-            var paginationObject = new { offset = nextOffset };
-            var paginationJson = JsonConvert.SerializeObject(paginationObject);
-            signedParams.Add("pagination_str", paginationJson);
+            parameters.Add("seek_rpid", "");
         }
+
+        var paginationObject = new { offset = nextOffset };
+        var paginationJson = JsonConvert.SerializeObject(paginationObject);
+        parameters.Add("pagination_str", paginationJson);
+        
+        var signedParams = await BiliWbiService.SignAsync(parameters);
 
         var query = await new FormUrlEncodedContent(signedParams).ReadAsStringAsync();
         //输出示例： bar=514&baz=1919810&foo=114&wts=1687541921&w_rid=26e82b1b9b3a11dbb1807a9228a40d3b
@@ -183,8 +185,7 @@ public static class BiliService
     /// </remarks>
     public static async Task<UserSpaceDetailsData?> GetUserSpaceDetailsData(HttpClient httpClient, long mid)
     {
-        var wbiService = new BiliWbiService();
-        var signedParams = await wbiService.SignAsync(new Dictionary<string, string>
+        var signedParams = await BiliWbiService.SignAsync(new Dictionary<string, string>
         {
             { "mid", mid.ToString() }
         });

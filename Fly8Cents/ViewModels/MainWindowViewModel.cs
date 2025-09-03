@@ -35,7 +35,7 @@ public class MainWindowViewModel : ViewModelBase
         var httpClient = handler != null ? new HttpClient(handler) : new HttpClient();
 
         httpClient.DefaultRequestHeaders.Add("User-Agent",
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0");
         httpClient.DefaultRequestHeaders.Add("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
         httpClient.DefaultRequestHeaders.Add("Referer", "https://www.bilibili.com/");
 

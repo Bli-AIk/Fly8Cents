@@ -92,15 +92,6 @@ namespace QuickType.LazyComment
     {
         [JsonProperty("message")]
         public string Message { get; set; }
-
-        [JsonProperty("emote", NullValueHandling = NullValueHandling.Ignore)]
-        public Emote Emote { get; set; }
-    }
-
-    public partial class Emote
-    {
-        [JsonProperty("[辣眼睛]")]
-        public Uri 辣眼睛 { get; set; }
     }
 
     public partial class Member

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Reactive;
+using System.Threading.Tasks;
 using Fly8Cents.Models;
 using Fly8Cents.Services;
 using QuickType.VideoKeywordQuery;
@@ -76,7 +77,6 @@ public class ExportViewModel : ReactiveObject
                 }
 
                 ConsoleOutput += "准备批量检索评论……\n";
-
                 foreach (var item in archives)
                 {
                     ConsoleOutput += $"正在处理视频：{item.Bvid}；\n视频标题：{item.Title}\n";
@@ -104,6 +104,7 @@ public class ExportViewModel : ReactiveObject
                             var dateTime = DateTimeOffset.FromUnixTimeSeconds(reply.Ctime);
                             var dateText = dateTime.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
                             CommentsText += $"{dateText}\nid: {reply.Member.Uname}\n{reply.Content.Message}\n\n";
+                            await Task.Delay(500);
                         }
 
                         if (lazyComment.Data.Cursor.IsEnd)
