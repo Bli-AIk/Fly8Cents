@@ -2,7 +2,7 @@
 //
 // To parse this JSON data, add NuGet 'Newtonsoft.Json' then do:
 //
-//    using QuickType;
+//    using QuickType.LazyComment;
 //
 //    var lazyCommentData = LazyCommentData.FromJson(jsonString);
 
@@ -56,6 +56,15 @@ namespace QuickType.LazyComment
 
         [JsonProperty("all_count")]
         public long AllCount { get; set; }
+
+        [JsonProperty("pagination_reply")]
+        public PaginationReply PaginationReply { get; set; }
+    }
+
+    public partial class PaginationReply
+    {
+        [JsonProperty("next_offset")]
+        public string NextOffset { get; set; }
     }
 
     public partial class Reply
@@ -127,12 +136,12 @@ namespace QuickType.LazyComment
 
     public partial class LazyCommentData
     {
-        public static LazyCommentData FromJson(string json) => JsonConvert.DeserializeObject<LazyCommentData>(json, Converter.Settings);
+        public static LazyCommentData FromJson(string json) => JsonConvert.DeserializeObject<LazyCommentData>(json, QuickType.LazyComment.Converter.Settings);
     }
 
     public static class Serialize
     {
-        public static string ToJson(this LazyCommentData self) => JsonConvert.SerializeObject(self, Converter.Settings);
+        public static string ToJson(this LazyCommentData self) => JsonConvert.SerializeObject(self, QuickType.LazyComment.Converter.Settings);
     }
 
     internal static class Converter

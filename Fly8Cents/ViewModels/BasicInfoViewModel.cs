@@ -1,14 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Fly8Cents.Models;
 using Fly8Cents.Services;
-using Newtonsoft.Json.Linq;
-using QuickType.UserSpaceDetails;
 using ReactiveUI;
 
 namespace Fly8Cents.ViewModels;
@@ -18,68 +16,76 @@ public class BasicInfoViewModel : ViewModelBase
     private DateTimeOffset _endDate = DateTimeOffset.Now;
 
     private DateTimeOffset _startDate = DateTimeOffset.Now.AddDays(-7);
-    private long _uid = 1424609716;
+
+    private UploaderInfoModel _uploader = new()
+    {
+        Uid = 1424609716,
+        Nickname = "请输入文本",
+        AvatarUrl = string.Empty
+    };
 
     private Bitmap _uploaderAvatar;
-
-    private string _uploaderNickname = "请输入文本";
 
     public BasicInfoViewModel(HttpClient httpClient)
     {
         _uploaderAvatar = GetDefaultBitmap();
-        CheckUid = ReactiveCommand.CreateFromTask(async () =>
+        ExtractUid = ReactiveCommand.CreateFromTask(async () =>
         {
             try
             {
-                var data = await BiliService.GetUserSpaceDetailsData(httpClient, _uid);
+                var data = await BiliService.GetUserSpaceDetailsData(httpClient, Uploader.Uid);
                 if (data != null)
                 {
-                    UploaderNickname = data.Data.Name;
-                    UploaderAvatar = await SetImageFromUrl(data.Data.Face);
+                    Uploader.Nickname = data.Data.Name;
+                    Uploader.AvatarUrl = data.Data.Face.ToString();
+                    UploaderAvatar = await SetImageFromUrl(new Uri(Uploader.AvatarUrl));
                 }
                 else
                 {
-                    UploaderNickname = "风控校验失败，请登录后重试";
+                    Uploader.Nickname = "风控校验失败，请登录后重试";
                     UploaderAvatar = GetDefaultBitmap();
                 }
+                MessageBus.Current.SendMessage(Uploader);
             }
             catch (Exception e)
             {
-                Console.WriteLine($"CheckUid报错：{e}");
+                Console.WriteLine($"ExtractUid Command报错：{e}");
             }
         });
     }
 
-    public long Uid
+    public UploaderInfoModel Uploader
     {
-        get => _uid;
-        set => this.RaiseAndSetIfChanged(ref _uid, value);
+        get => _uploader;
+        set => this.RaiseAndSetIfChanged(ref _uploader, value);
     }
-
     public DateTimeOffset StartDate
     {
-        get => _startDate;
-        set => this.RaiseAndSetIfChanged(ref _startDate, value);
+        get => new(_startDate.Year, _startDate.Month, _startDate.Day, 0, 0, 0, _startDate.Offset);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _startDate, value);
+            MessageBus.Current.SendMessage(StartDate, "StartDate");
+        }
     }
 
     public DateTimeOffset EndDate
     {
-        get => _endDate;
-        set => this.RaiseAndSetIfChanged(ref _endDate, value);
+        get => new(_endDate.Year, _endDate.Month, _endDate.Day, 23, 59, 59, _endDate.Offset);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _endDate, value); 
+            MessageBus.Current.SendMessage(EndDate, "EndDate");
+        }
     }
 
-    public ReactiveCommand<Unit, Unit> CheckUid { get; }
+    public ReactiveCommand<Unit, Unit> ExtractUid { get; }
+
 
     public Bitmap UploaderAvatar
     {
         get => _uploaderAvatar;
         set => this.RaiseAndSetIfChanged(ref _uploaderAvatar, value);
-    }
-
-    public string UploaderNickname
-    {
-        get => _uploaderNickname;
-        set => this.RaiseAndSetIfChanged(ref _uploaderNickname, value);
     }
 
     private static Bitmap GetDefaultBitmap()

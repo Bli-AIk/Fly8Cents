@@ -10,8 +10,8 @@
     <Grid Margin="10" RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="Auto,*">
         <TextBlock Text="UP主UID:" Grid.Row="0" Grid.Column="0" Margin="10,5" />
         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1">
-            <TextBox Width="300" Text="{Binding Uid, Mode=TwoWay}" />
-            <Button Content="检查" Command="{Binding CheckUid}" Margin="5,0,0,0" />
+            <TextBox Width="300" Text="{Binding Uploader.Uid, Mode=TwoWay}" />
+            <Button Content="提取" Command="{Binding ExtractUid}" Margin="5,0,0,0" />
         </StackPanel>
 
         <TextBlock Text="评论时间范围:" Grid.Row="1" Grid.Column="0" Margin="10,15" />
@@ -27,7 +27,7 @@
             <TextBlock Text="提取的目标UP主" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"
                        FontWeight="Bold" />
             <Image Source="{Binding UploaderAvatar}" Width="150" Height="150" HorizontalAlignment="Center" />
-            <TextBlock Text="{Binding UploaderNickname}" VerticalAlignment="Center" HorizontalAlignment="Center"
+            <TextBlock Text="{Binding Uploader.Nickname}" VerticalAlignment="Center" HorizontalAlignment="Center"
                        FontSize="16" />
         </StackPanel>
 

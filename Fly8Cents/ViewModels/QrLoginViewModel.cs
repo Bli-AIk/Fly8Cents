@@ -122,7 +122,6 @@ public class QrLoginViewModel : ViewModelBase
 
         var buvid3Data = Buvid3Data.FromJson(response);
         var buvid3 = buvid3Data.Data.Buvid;
-        Console.WriteLine($"buvid3: {buvid3}");
         return buvid3;
     }
 
@@ -141,7 +140,6 @@ public class QrLoginViewModel : ViewModelBase
             }
 
             var value = cookie.Split(';')[0].Split('=')[1];
-            Console.WriteLine($"{name}: {value}");
             return value;
         }
 

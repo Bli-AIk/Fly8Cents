@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using QuickType.LazyComment;
 using QuickType.UserSpaceDetails;
@@ -124,6 +125,7 @@ public static class BiliService
     /// <param name="httpClient">HttpClient 实例</param>
     /// <param name="type">评论区类型代码</param>
     /// <param name="oid">目标评论区 id</param>
+    /// <param name="nextOffset">上次响应 data.cursor.nextOffset 的值。为空时获取第一页</param>
     /// <param name="mode">排序方式，详见参考</param>
     /// <returns>LazyCommentData</returns>
     /// <remarks>
@@ -133,6 +135,7 @@ public static class BiliService
     public static async Task<LazyCommentData> GetLazyComment(HttpClient httpClient,
         CommentAreaType type,
         long oid,
+        string nextOffset,
         int mode = 3)
     {
         var wbiService = new BiliWbiService();
@@ -140,8 +143,18 @@ public static class BiliService
         {
             { "oid", oid.ToString() },
             { "type", ((int)type).ToString() },
-            { "mode", mode.ToString() }
+            { "mode", mode.ToString() },
+            { "web_location", "1315875" },
+            { "plat", "1" }
         });
+
+
+        if (!string.IsNullOrEmpty(nextOffset))
+        {
+            var paginationObject = new { offset = nextOffset };
+            var paginationJson = JsonConvert.SerializeObject(paginationObject);
+            signedParams.Add("pagination_str", paginationJson);
+        }
 
         var query = await new FormUrlEncodedContent(signedParams).ReadAsStringAsync();
         //输出示例： bar=514&baz=1919810&foo=114&wts=1687541921&w_rid=26e82b1b9b3a11dbb1807a9228a40d3b

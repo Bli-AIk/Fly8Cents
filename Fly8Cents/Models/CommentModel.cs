@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using ReactiveUI;
 
 namespace Fly8Cents.Models;
 
-public class Comment
+public class CommentModel
 {
     /// <summary>
     ///     用户名
@@ -24,7 +25,7 @@ public class Comment
     public long Ctime { get; init; }
 
 
-    [JsonPropertyName("replies")] public List<Comment>? Replies { get; set; }
+    [JsonPropertyName("replies")] public List<CommentModel>? Replies { get; set; }
 }
 
 public enum CommentType

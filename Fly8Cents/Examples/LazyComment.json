@@ -8,7 +8,10 @@
       "prev": 71880,
       "next": 71859,
       "is_end": false,
-      "all_count": 86234
+      "all_count": 86234,
+      "pagination_reply": {
+        "next_offset": "{\"type\":3,\"direction\":1,\"Data\":{\"cursor\":71859}}"
+      }
     },
     "replies": [
       {

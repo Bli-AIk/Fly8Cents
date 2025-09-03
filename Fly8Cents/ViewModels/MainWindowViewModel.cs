@@ -13,11 +13,12 @@ public class MainWindowViewModel : ViewModelBase
 
         QrLogin = new QrLoginViewModel(HttpClient);
         BasicInfo = new BasicInfoViewModel(HttpClient);
+        Export = new ExportViewModel(HttpClient);
     }
 
     public ConfigViewModel Config { get; } = new();
     public TextSettingsViewModel TextSettings { get; } = new();
-    public ExportViewModel Export { get; } = new();
+    public ExportViewModel Export { get; }
 
     private HttpClient HttpClient { get; }
     public QrLoginViewModel QrLogin { get; }
