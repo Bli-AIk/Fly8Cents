@@ -1,17 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using QuickType.LazyComment;
 using QuickType.UserSpaceDetails;
+using QuickType.VideoKeywordQuery;
 
 namespace Fly8Cents.Services;
 
 public static class BiliService
 {
     /// <summary>
-    /// 评论区类型代码（来源不完全可靠，仅供参考）
+    ///     评论区类型代码（来源不完全可靠，仅供参考）
     /// </summary>
     public enum CommentAreaType
     {
@@ -79,13 +81,59 @@ public static class BiliService
         Manga = 22,
 
         /// <summary>课程，oid = epid</summary>
-        Course = 33,
+        Course = 33
     }
 
+    /// <summary>
+    ///     根据关键词查找视频。
+    /// </summary>
+    /// <param name="httpClient">HttpClient 实例</param>
+    /// <param name="mid">用户 UID</param>
+    /// <param name="keywords">关键词。可为空, 即获取所有视频</param>
+    /// <returns>VideoKeywordQueryData</returns>
+    /// <remarks>
+    ///     参考：
+    ///     <see href="https://socialsisteryi.github.io/bilibili-API-collect/docs/video/collection.html" />
+    /// </remarks>
+    public static async Task<VideoKeywordQueryData> GetVideoKeywordQuery(HttpClient httpClient,
+        long mid,
+        string keywords = "")
+    {
+        const string baseUrl = "https://api.bilibili.com/x/series/recArchivesByKeywords";
+
+        var query = new Dictionary<string, string>
+        {
+            { "mid", mid.ToString() },
+            { "keywords", keywords },
+            { "ps", "0" }
+        };
+
+        var queryString = string.Join("&", query.Select(kvp =>
+            $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}"));
+
+        var requestUri = $"{baseUrl}?{queryString}";
+
+        Console.WriteLine("RequestUri: " + requestUri);
+        var response = await httpClient.GetStringAsync(requestUri);
+        return VideoKeywordQueryData.FromJson(response);
+    }
+
+    /// <summary>
+    ///     获取评论区明细（懒加载）。
+    /// </summary>
+    /// <param name="httpClient">HttpClient 实例</param>
+    /// <param name="type">评论区类型代码</param>
+    /// <param name="oid">目标评论区 id</param>
+    /// <param name="mode">排序方式，详见参考</param>
+    /// <returns>LazyCommentData</returns>
+    /// <remarks>
+    ///     参考：
+    ///     <see href="https://socialsisteryi.github.io/bilibili-API-collect/docs/comment/list.html" />
+    /// </remarks>
     public static async Task<LazyCommentData> GetLazyComment(HttpClient httpClient,
         CommentAreaType type,
         long oid,
-        int mode = 3) 
+        int mode = 3)
     {
         var wbiService = new BiliWbiService();
         var signedParams = await wbiService.SignAsync(new Dictionary<string, string>
@@ -99,37 +147,44 @@ public static class BiliService
         //输出示例： bar=514&baz=1919810&foo=114&wts=1687541921&w_rid=26e82b1b9b3a11dbb1807a9228a40d3b
 
         var requestUri = $"https://api.bilibili.com/x/v2/reply/wbi/main?{query}";
-        
+
         Console.WriteLine(httpClient.DefaultRequestHeaders);
-        Console.WriteLine(requestUri);
-        
-        var response = await httpClient.GetStringAsync(
-            requestUri
-        );
-        
+        Console.WriteLine("RequestUri: " + requestUri);
+
+        var response = await httpClient.GetStringAsync(requestUri);
+
         var data = LazyCommentData.FromJson(response);
         return data;
     }
-    
-    public static async Task<UserSpaceDetailsData?> GetUserSpaceDetailsData(HttpClient httpClient, long uid)
+
+    /// <summary>
+    ///     用户空间详细信息
+    /// </summary>
+    /// <param name="httpClient">HttpClient 实例</param>
+    /// <param name="mid">目标用户mid</param>
+    /// <returns>UserSpaceDetailsData</returns>
+    /// <exception cref="InvalidOperationException">风控校验失败</exception>
+    /// <remarks>
+    ///     参考：
+    ///     <see href="https://socialsisteryi.github.io/bilibili-API-collect/docs/user/info.html" />
+    /// </remarks>
+    public static async Task<UserSpaceDetailsData?> GetUserSpaceDetailsData(HttpClient httpClient, long mid)
     {
         var wbiService = new BiliWbiService();
         var signedParams = await wbiService.SignAsync(new Dictionary<string, string>
         {
-            { "mid", uid.ToString() }
+            { "mid", mid.ToString() }
         });
 
         var query = await new FormUrlEncodedContent(signedParams).ReadAsStringAsync();
         //输出示例： bar=514&baz=1919810&foo=114&wts=1687541921&w_rid=26e82b1b9b3a11dbb1807a9228a40d3b
 
         var requestUri = $"https://api.bilibili.com/x/space/wbi/acc/info?{query}";
-        
+
         Console.WriteLine(httpClient.DefaultRequestHeaders);
-        Console.WriteLine(requestUri);
-        
-        var response = await httpClient.GetStringAsync(
-            requestUri
-        );
+        Console.WriteLine("RequestUri: " + requestUri);
+
+        var response = await httpClient.GetStringAsync(requestUri);
 
         var obj = JObject.Parse(response);
 
