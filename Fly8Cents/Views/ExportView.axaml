@@ -15,7 +15,7 @@
                     <Button Content="爬取评论"
                             Command="{Binding FetchCommentsCommand}" />
                     <CheckBox Content="剔除时间范围外的评论" Margin="5,0"
-                              IsChecked="{Binding IsExcludeOutOfRangeComments}"/>
+                              IsChecked="{Binding IsExcludeOutOfRangeComments}" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal"
@@ -23,63 +23,66 @@
                             HorizontalAlignment="Right"
                             Grid.Column="1">
                     <CheckBox Content="爬取视频" Margin="5,0"
-                              IsChecked="{Binding IsFetchVideos}"/>
-                    <CheckBox Content="爬取动态" Margin="5,0" 
-                              IsChecked="{Binding IsFetchSpaces}"/>
+                              IsChecked="{Binding IsFetchVideos}" />
+                    <CheckBox Content="爬取动态" Margin="5,0"
+                              IsChecked="{Binding IsFetchSpaces}" />
                 </StackPanel>
             </Grid>
 
             <ScrollViewer Height="100" VerticalScrollBarVisibility="Auto">
-                <TextBlock Text="{Binding ConsoleOutput}" 
+                <TextBlock Text="{Binding ConsoleOutput}"
                            FontFamily="Consolas"
                            TextWrapping="Wrap" />
             </ScrollViewer>
         </StackPanel>
 
         <!-- 中间大文本框，可编辑 -->
-        <TextBox Grid.Row="1" 
-                 AcceptsReturn="True" 
+        <TextBox Grid.Row="1"
+                 AcceptsReturn="True"
                  TextWrapping="Wrap"
                  Text="{Binding CommentsText, Mode=TwoWay}" />
 
         <!-- 底部导出及视频参数 -->
         <StackPanel Grid.Row="2" Orientation="Vertical" Spacing="10">
 
-            <!-- 视频参数 -->
-            <StackPanel Orientation="Horizontal" Spacing="10">
-                <!-- 分辨率 -->
-                <StackPanel Orientation="Vertical">
-                    <TextBlock Text="分辨率" />
-                    <ComboBox ItemsSource="{Binding ResolutionOptions}" 
-                              SelectedItem="{Binding SelectedResolution}" Width="120"/>
-                </StackPanel>
+            <Grid ColumnDefinitions="*,*">
+                <!-- 视频参数 -->
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <!-- 分辨率 -->
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="分辨率" />
+                        <ComboBox ItemsSource="{Binding ResolutionOptions}"
+                                  SelectedItem="{Binding SelectedResolution}" Width="120" />
+                    </StackPanel>
 
-                <!-- 帧率 -->
-                <StackPanel Orientation="Vertical">
-                    <TextBlock Text="帧率" />
-                    <ComboBox ItemsSource="{Binding FrameRateOptions}" 
-                              SelectedItem="{Binding SelectedFrameRate}" Width="80"/>
-                </StackPanel>
+                    <!-- 帧率 -->
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="帧率" />
+                        <ComboBox ItemsSource="{Binding FrameRateOptions}"
+                                  SelectedItem="{Binding SelectedFrameRate}" Width="80" />
+                    </StackPanel>
 
-                <!-- 时长 -->
-                <StackPanel Orientation="Vertical">
-                    <TextBlock Text="时长 (秒)" />
-                    <NumericUpDown Minimum="1" Maximum="3600" 
-                                   Value="{Binding VideoDuration}" Width="150"/>
-                </StackPanel>
+                    <!-- 时长 -->
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="时长 (秒)" />
+                        <NumericUpDown Minimum="1" Maximum="3600"
+                                       Value="{Binding VideoDuration}" Width="150" />
+                    </StackPanel>
 
-                <!-- 输出精度 -->
-                <StackPanel Orientation="Vertical">
-                    <TextBlock Text="输出精度" />
-                    <ComboBox ItemsSource="{Binding PresetOptions}" 
-                              SelectedItem="{Binding SelectedPreset}" Width="120"/>
+                    <!-- 输出精度 -->
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="输出精度" />
+                        <ComboBox ItemsSource="{Binding PresetOptions}"
+                                  SelectedItem="{Binding SelectedPreset}" Width="120" />
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
-
+                
+                <TextBlock Grid.Column="1" Text="{Binding EstimatedTimeText}" HorizontalAlignment="Right"/>
+            </Grid>
             <!-- 导出按钮 -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="读取文本" Command="{Binding LoadTextCommand}" Margin="5,0"/>
-                <Button Content="保存文本" Command="{Binding SaveTextCommand}" Margin="5,0"/>
+                <Button Content="读取文本" Command="{Binding LoadTextCommand}" Margin="5,0" />
+                <Button Content="保存文本" Command="{Binding SaveTextCommand}" Margin="5,0" />
                 <Button Content="导出视频" Command="{Binding ExportCommentsCommand}" />
             </StackPanel>
 

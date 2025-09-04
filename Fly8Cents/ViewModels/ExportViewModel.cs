@@ -38,6 +38,19 @@ public class ExportViewModel : ReactiveObject
 
     public ExportViewModel(HttpClient httpClient)
     {
+        _estimatedTimeText = this.WhenAnyValue(x => x.CommentsText)
+            .Select(text =>
+            {
+                if (string.IsNullOrEmpty(text))
+                {
+                    return "";
+                }
+
+                var lines = VideoGenerateService.WrapString(text).Split([Environment.NewLine], StringSplitOptions.None).Length;
+                return $"格式化后行数：{lines}。预计导出时长为{lines * 2}秒。";
+            })
+            .ToProperty(this, x => x.EstimatedTimeText);
+        
         MessageBus.Current.Listen<UploaderInfoModel>()
             .Subscribe(uploader => { Uploader = uploader; });
         MessageBus.Current.Listen<ConfigModel>()
@@ -284,6 +297,9 @@ public class ExportViewModel : ReactiveObject
         get => _commentsText;
         set => this.RaiseAndSetIfChanged(ref _commentsText, value);
     }
+
+    private readonly ObservableAsPropertyHelper<string> _estimatedTimeText;
+    public string EstimatedTimeText => _estimatedTimeText.Value;
 
     // 视频参数属性
     public List<string> ResolutionOptions { get; }

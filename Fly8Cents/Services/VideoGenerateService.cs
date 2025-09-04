@@ -101,14 +101,24 @@ public static class VideoGenerateService
         var width = int.Parse(dimensions[0]);
         var height = int.Parse(dimensions[1]);
 
+        var scaleX = width / 3840.0;
+        var scaleY = height / 2160.0;
+        var perspX0 = (int)(1050 * scaleX);
+        var perspY0 = (int)(570 * scaleY);
+        var perspX1 = (int)(2790 * scaleX);
+        var perspY1 = (int)(570 * scaleY);
+        var perspX2 = (int)(1800 * scaleX);
+        
+        var speed = (int)(100 * scaleY);
         // FFmpeg
         var arguments = new StringBuilder().Append($"-f lavfi -i nullsrc=s={resolution} -i ")
             .Append($"\"{pngPath}\"")
             .Append(" -filter_complex ")
             .Append('"')
             .Append("[0:v]drawbox=t=fill[base];")
-            .Append("[base][1:v]overlay=x=0:y=main_h-(100*t)[fg];")
-            .Append("[fg]perspective=1050:570:2790:570:-1800:H:W+1800:H:sense=destination[persp];")
+            .Append($"[base][1:v]overlay=x=0:y=main_h-({speed}*t)[fg];")
+            .Append($"[fg]perspective={perspX0}:{perspY0}:{perspX1}:{perspY1}:-{perspX2}:H:W+{perspX2}:")
+            .Append("H:sense=destination[persp];")
             .Append($"[persp]drawbox=0:0:{width}:{height * 0.1}:t=fill,")
             .Append($"drawbox=0:{height - height * 0.1}:{width}:{height * 0.1}:t=fill")
             .Append('"')
@@ -218,5 +228,4 @@ public static class VideoGenerateService
 
         return sb.ToString();
     }
-
 }
