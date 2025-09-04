@@ -182,7 +182,7 @@ public class ExportViewModel : ReactiveObject
                         }
 
                         var textPngArguments =
-                            VideoGenerateService.GetTextPngArguments(formattedTextLine, lineCount, SelectedResolution);
+                            VideoGenerateService.GetTextPngArguments(SelectedResolution, formattedTextLine, lineCount);
                         await VideoGenerateService.RunFfmpegAsync(ffmpegPath, textPngArguments);
 
                         ConsoleWriteLine($"第{lineCount}张文本图片导出完毕。");
@@ -195,11 +195,22 @@ public class ExportViewModel : ReactiveObject
                 ImageStitcher.DeleteImages(lineCount);
                 ConsoleWriteLine("清理完毕。");
                 
+                ConsoleWriteLine("开始导出视频1（片头）。");
+                var video1Arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset, SelectedFrameRate, VideoDuration);
+                await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video1Arguments);
+                ConsoleWriteLine("视频1（片头）导出完毕。");
+                
+                ConsoleWriteLine("开始导出视频3（片尾）。");
+                var video3Arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset, SelectedFrameRate, VideoDuration);
+                await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video3Arguments);
+                ConsoleWriteLine("视频3（片尾）导出完毕。");
+                
                 ConsoleWriteLine("开始导出视频2（正片）。");
-                var video2Arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset,
-                    VideoDuration, SelectedFrameRate);
+                var video2Arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset, SelectedFrameRate, VideoDuration);
                 await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video2Arguments);
                 ConsoleWriteLine("视频2（正片）导出完毕。");
+                
+                ConsoleWriteLine("所有视频导出完毕。");
             }
             catch (Exception ex)
             {

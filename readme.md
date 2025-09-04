@@ -24,7 +24,7 @@
 
 本项目参考了以下学习资料：
 - [How to make a Star Wars scrolling / crawl opening text video in 4k | Video crawler](https://www.youtube.com/watch?v=ee-p815fLYM&ab_channel=TheFFMPEGguy)
-
+- [Fade In and Out text using the 'drawtext' filter](https://ffmpegbyexample.com/examples/50gowmkq/fade_in_and_out_text_using_the_drawtext_filter/)
 衷心感谢你们！
 
 ## 贡献

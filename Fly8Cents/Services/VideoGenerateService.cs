@@ -49,7 +49,7 @@ public static class VideoGenerateService
         return resultBuilder.ToString();
     }
 
-    public static string GetTextPngArguments(string text, int lineCount, string resolution)
+    public static string GetTextPngArguments(string resolution, string text, int lineCount)
     {
         var exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -84,7 +84,47 @@ public static class VideoGenerateService
         return arguments;
     }
 
-    public static string GetVideo2Arguments(string resolution, string preset, double duration, int frameRate)
+    public static string GetVideo1Arguments(string resolution, string preset, int frameRate, string text)
+    {
+        var exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        if (exeDir == null)
+        {
+            throw new InvalidOperationException("无法获取当前程序集所在目录。");
+        }
+
+        var outputPath = Path.Combine(exeDir, "output_1.mp4");
+        var fullFontPath = Path.Combine(exeDir, "Assets/Fonts/Font.otf");
+
+        var dimensions = resolution.Split('x');
+
+        var height = int.Parse(dimensions[1]);
+        var fontSize = (int)(height * 0.07);
+        
+        // FFmpeg
+        var arguments = new StringBuilder().Append($"-f lavfi -i nullsrc=s={resolution} -vf ")
+            .Append('"')
+            .Append("drawbox=t=fill,")
+            .Append($"drawtext=fontfile='{fullFontPath}':text='{text}':text_align=C:reload=0:")
+            .Append($"x=(w-text_w)/2:y=({height}-text_h)/2:")
+            .Append($@"fontsize={fontSize}*if(lt(t\,5)\,2\,if(lt(t\,8)\,2-(t-5)*(2-0.25)/3\,0.25)):")
+            .Append(@"fontcolor=0xb89801:alpha=if(lt(t\,2)\,0\,if(lt(t\,4)\,(t-2)/2\,if(lt(t\,7)\,1\,if(lt(t\,8)\,1-(t-7)/1\,0))))")
+            .Append('"')
+            .Append($" -preset {preset} ")
+            .Append("-crf 23 ")
+            .Append("-t 8 ")
+            .Append($"-r {frameRate} ")
+            .Append("-y ")
+            .Append('"')
+            .Append(outputPath)
+            .Append('"')
+            .Append(" -progress pipe:1")
+            .ToString();
+
+        return arguments;
+    }
+
+    public static string GetVideo2Arguments(string resolution, string preset, int frameRate, double duration)
     {
         var exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -125,6 +165,47 @@ public static class VideoGenerateService
             .Append($" -preset {preset} ")
             .Append("-crf 23 ")
             .Append($"-t {duration} ")
+            .Append($"-r {frameRate} ")
+            .Append("-y ")
+            .Append('"')
+            .Append(outputPath)
+            .Append('"')
+            .Append(" -progress pipe:1")
+            .ToString();
+
+        return arguments;
+    }
+    
+    public static string GetVideo3Arguments(string resolution, string preset, int frameRate, string text)
+    {
+        var exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        if (exeDir == null)
+        {
+            throw new InvalidOperationException("无法获取当前程序集所在目录。");
+        }
+
+        var outputPath = Path.Combine(exeDir, "output_3.mp4");
+        var fullFontPath = Path.Combine(exeDir, "Assets/Fonts/Font.otf");
+
+        var dimensions = resolution.Split('x');
+
+        var height = int.Parse(dimensions[1]);
+        var fontSize = (int)(height * 0.07);
+        
+        // FFmpeg
+        var arguments = new StringBuilder().Append($"-f lavfi -i nullsrc=s={resolution} -vf ")
+            .Append('"')
+            .Append("drawbox=t=fill,")
+            .Append($"drawtext=fontfile='{fullFontPath}':text='{text}':text_align=C:reload=0:")
+            // 尊重沈美老师，text_h*2
+            .Append($"x=(w-text_w)/2:y=({height}-text_h*2)/2:")
+            .Append($"fontsize={fontSize}*3:")
+            .Append("fontcolor=0xb89801:alpha='min(t,1)'")
+            .Append('"')
+            .Append($" -preset {preset} ")
+            .Append("-crf 23 ")
+            .Append("-t 10 ")
             .Append($"-r {frameRate} ")
             .Append("-y ")
             .Append('"')
