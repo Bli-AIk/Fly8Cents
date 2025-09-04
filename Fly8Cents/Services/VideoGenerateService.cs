@@ -49,7 +49,7 @@ public static class VideoGenerateService
         return resultBuilder.ToString();
     }
 
-    public static string GetTextPngArguments(string resolution, int textRowHeight)
+    public static string GetTextPngArguments(string text, int lineCount, string resolution)
     {
         var exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -58,22 +58,21 @@ public static class VideoGenerateService
             throw new InvalidOperationException("无法获取当前程序集所在目录。");
         }
 
-        var pngPath = Path.Combine(exeDir, "output.png");
+        var pngPath = Path.Combine(exeDir, $"output_{lineCount}.png");
         var fullFontPath = Path.Combine(exeDir, "Assets/Fonts/Font.otf");
-        var fullTextFile = Path.Combine(exeDir, "Comments.txt");
 
         var dimensions = resolution.Split('x');
 
         var width = int.Parse(dimensions[0]);
         var basicHeight = int.Parse(dimensions[1]);
         var fontSize = (int)(basicHeight * 0.07);
-        var height = textRowHeight * (fontSize + fontSize / 15);
+        var height = (int)(fontSize * 1.067);
 
         // FFmpeg
         var arguments = new StringBuilder().Append($"-f lavfi -i nullsrc=s={width}x{height} -vf ")
             .Append('"')
             .Append(
-                $"drawbox=t=fill,drawtext=fontfile='{fullFontPath}':textfile='{fullTextFile}':text_align=C:reload=0:")
+                $"drawbox=t=fill,drawtext=fontfile='{fullFontPath}':text='{text}':text_align=C:reload=0:")
             .Append($"x=(w-text_w)/2:y=50:fontsize={fontSize}:fontcolor=0xb89801")
             .Append('"')
             .Append(" -frames:v 1 -y ")

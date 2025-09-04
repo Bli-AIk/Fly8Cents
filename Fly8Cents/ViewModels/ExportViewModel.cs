@@ -126,10 +126,6 @@ public class ExportViewModel : ReactiveObject
 
                 var filePath = Path.Combine(appDirectory, "Comments.txt");
 
-                ConsoleWriteLine("正在格式化文本……");
-                CommentsText = VideoGenerateService.WrapString(CommentsText);
-                ConsoleWriteLine("文本格式化完毕。");
-
                 await File.WriteAllTextAsync(filePath, CommentsText);
                 ConsoleWriteLine("文本已保存");
             }
@@ -149,18 +145,38 @@ public class ExportViewModel : ReactiveObject
                     ConsoleWriteLine("请在导出前输入文本。");
                     return;
                 }
-
                 await SaveTextCommand.Execute();
+
+                ConsoleWriteLine("正在格式化文本……");
+                var formattedText = VideoGenerateService.WrapString(CommentsText);
+                ConsoleWriteLine("文本格式化完毕。");
 
                 ConsoleWriteLine("启动FFMPEG进程……");
                 ConsoleWriteLine($"工作目录：{Environment.CurrentDirectory}");
 
                 const string ffmpegPath = "ffmpeg";
-                
-                var textRowHeight = CommentsText.Count(c => c == '\n') + 1;
-                var textPngArguments = VideoGenerateService.GetTextPngArguments(SelectedResolution, textRowHeight);
-                await VideoGenerateService.RunFfmpegAsync(ffmpegPath, textPngArguments);
-                ConsoleWriteLine("文本图片导出完毕。");
+
+                using (var reader = new StringReader(formattedText))
+                {
+                    var lineCount = 0;
+
+                    while (reader.ReadLine() is { } formattedTextLine)
+                    {
+                        lineCount++;
+
+                        if (string.IsNullOrWhiteSpace(formattedTextLine))
+                        {
+                            continue;
+                        }
+
+                        var textPngArguments =
+                            VideoGenerateService.GetTextPngArguments(formattedTextLine, lineCount, SelectedResolution);
+                        await VideoGenerateService.RunFfmpegAsync(ffmpegPath, textPngArguments);
+
+                        Console.WriteLine($"第{lineCount}张文本图片导出完毕。");
+                    }
+                }
+                Console.WriteLine("所有文本图片导出完毕。");
 
                 var video2Arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset,
                     VideoDuration, SelectedFrameRate);
