@@ -20,6 +20,7 @@
 - [bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
 - [quicktype](https://github.com/glideapps/quicktype)
 - [Pinyin4NET](https://github.com/hyjiacan/Pinyin4NET)
+- [ImageSharp](https://github.com/SixLabors/ImageSharp)
 
 本项目参考了以下学习资料：
 - [How to make a Star Wars scrolling / crawl opening text video in 4k | Video crawler](https://www.youtube.com/watch?v=ee-p815fLYM&ab_channel=TheFFMPEGguy)

@@ -72,8 +72,8 @@ public static class VideoGenerateService
         var arguments = new StringBuilder().Append($"-f lavfi -i nullsrc=s={width}x{height} -vf ")
             .Append('"')
             .Append(
-                $"drawbox=t=fill,drawtext=fontfile='{fullFontPath}':text='{text}':text_align=C:reload=0:")
-            .Append($"x=(w-text_w)/2:y=50:fontsize={fontSize}:fontcolor=0xb89801")
+                $"drawbox=t=fill,drawtext=fontfile='{fullFontPath}':text='{EscapeForDrawText(text)}':text_align=C:reload=0:")
+            .Append($"x=(w-text_w)/2:fontsize={fontSize}:fontcolor=0xb89801")
             .Append('"')
             .Append(" -frames:v 1 -y ")
             .Append('"')
@@ -184,4 +184,39 @@ public static class VideoGenerateService
 
         return tcs.Task;
     }
+
+    private static string EscapeForDrawText(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return input;
+        }
+
+        var sb = new StringBuilder();
+
+        foreach (var c in input)
+        {
+            switch (c)
+            {
+                case ':':
+                    sb.Append("\\:"); // FFmpeg 参数分隔符
+                    break;
+                case '\'':
+                    sb.Append("\\'"); // 单引号
+                    break;
+                case '\"':
+                    sb.Append("\\\""); // 双引号
+                    break;
+                case '\\':
+                    sb.Append(@"\\"); // 反斜杠
+                    break;
+                default:
+                    sb.Append(c);
+                    break;
+            }
+        }
+
+        return sb.ToString();
+    }
+
 }

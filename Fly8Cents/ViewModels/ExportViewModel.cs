@@ -145,20 +145,19 @@ public class ExportViewModel : ReactiveObject
                     ConsoleWriteLine("请在导出前输入文本。");
                     return;
                 }
-                await SaveTextCommand.Execute();
 
                 ConsoleWriteLine("正在格式化文本……");
                 var formattedText = VideoGenerateService.WrapString(CommentsText);
                 ConsoleWriteLine("文本格式化完毕。");
 
-                ConsoleWriteLine("启动FFMPEG进程……");
+                ConsoleWriteLine("准备启动FFMPEG进程……");
                 ConsoleWriteLine($"工作目录：{Environment.CurrentDirectory}");
 
                 const string ffmpegPath = "ffmpeg";
 
+                var lineCount = -1;
                 using (var reader = new StringReader(formattedText))
                 {
-                    var lineCount = 0;
 
                     while (reader.ReadLine() is { } formattedTextLine)
                     {
@@ -173,11 +172,17 @@ public class ExportViewModel : ReactiveObject
                             VideoGenerateService.GetTextPngArguments(formattedTextLine, lineCount, SelectedResolution);
                         await VideoGenerateService.RunFfmpegAsync(ffmpegPath, textPngArguments);
 
-                        Console.WriteLine($"第{lineCount}张文本图片导出完毕。");
+                        ConsoleWriteLine($"第{lineCount}张文本图片导出完毕。");
                     }
                 }
-                Console.WriteLine("所有文本图片导出完毕。");
-
+                ConsoleWriteLine("所有文本图片导出完毕。\n准备拼接……");
+            
+                ImageStitcher.StitchImages(lineCount);
+                ConsoleWriteLine("拼接完毕。\n正在清理冗余图片…");
+                ImageStitcher.DeleteImages(lineCount);
+                ConsoleWriteLine("清理完毕。");
+                
+                ConsoleWriteLine("开始导出视频2（正片）。");
                 var video2Arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset,
                     VideoDuration, SelectedFrameRate);
                 await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video2Arguments);
