@@ -34,7 +34,7 @@ public static class VideoGenerateService
         var arguments = new StringBuilder().Append($"-f lavfi -i nullsrc=s={resolution} -vf ")
             .Append("drawbox=t=fill,")
             .Append($"drawtext={fullFontPath}:")
-            .Append($"textfile={fullTextFile}:")
+            .Append($"textfile={fullTextFile}:reload=0:")
             .Append($"x=(w-text_w)/2:y=h-100*t:fontsize={fontSize}:fontcolor=0xb89801,")
             .Append("drawbox,")
             .Append("perspective=1050:570:2790:570:-1800:H:W+1800:H:sense=destination,")
