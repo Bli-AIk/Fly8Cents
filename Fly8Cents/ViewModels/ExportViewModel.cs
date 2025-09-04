@@ -126,6 +126,10 @@ public class ExportViewModel : ReactiveObject
 
                 var filePath = Path.Combine(appDirectory, "Comments.txt");
 
+                ConsoleWriteLine("正在格式化文本……");
+                CommentsText = VideoGenerateService.WrapString(CommentsText);
+                ConsoleWriteLine("文本格式化完毕。");
+
                 await File.WriteAllTextAsync(filePath, CommentsText);
                 ConsoleWriteLine("文本已保存");
             }
@@ -152,12 +156,16 @@ public class ExportViewModel : ReactiveObject
                 ConsoleWriteLine($"工作目录：{Environment.CurrentDirectory}");
 
                 const string ffmpegPath = "ffmpeg";
+                
+                var textRowHeight = CommentsText.Count(c => c == '\n') + 1;
+                var textPngArguments = VideoGenerateService.GetTextPngArguments(SelectedResolution, textRowHeight);
+                await VideoGenerateService.RunFfmpegAsync(ffmpegPath, textPngArguments);
+                ConsoleWriteLine("文本图片导出完毕。");
 
-                var arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset,
+                var video2Arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset,
                     VideoDuration, SelectedFrameRate);
-
-                await VideoGenerateService.RunFfmpegAsync(ffmpegPath, arguments);
-                ConsoleWriteLine("FFMPEG进程成功完成。");
+                await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video2Arguments);
+                ConsoleWriteLine("视频2（正片）导出完毕。");
             }
             catch (Exception ex)
             {
@@ -359,6 +367,7 @@ public class ExportViewModel : ReactiveObject
                 ConsoleOutput += errorConsole;
                 continue;
             }
+
             ConsoleOutput += successConsole;
 
             foreach (var reply in lazyComment.Data.Replies)
@@ -465,11 +474,11 @@ public class ExportViewModel : ReactiveObject
                     {
                         continue;
                     }
-                    
+
                     isBreak = true;
                     break;
                 }
-                
+
                 var basicCommentType = (BiliService.CommentAreaType)item.Basic.CommentType;
 
                 if (basicCommentType is not (BiliService.CommentAreaType.Album or BiliService.CommentAreaType.Dynamic))
@@ -492,6 +501,7 @@ public class ExportViewModel : ReactiveObject
 
             await Task.Delay(5000);
         }
+
         ConsoleOutput += "动态爬取完成。\n";
     }
 
