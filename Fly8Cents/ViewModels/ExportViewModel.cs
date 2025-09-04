@@ -22,6 +22,9 @@ public class ExportViewModel : ReactiveObject
     private string _consoleOutput = "";
 
     private DateTimeOffset _endDate = DateTimeOffset.Now;
+    private bool _isExcludeOutOfRangeComments;
+    private bool _isFetchSpaces = true;
+    private bool _isFetchVideos = true;
     private int _selectedFrameRate;
     private string _selectedPreset = "";
 
@@ -50,103 +53,17 @@ public class ExportViewModel : ReactiveObject
             {
                 CommentsText = "";
 
-                ConsoleOutput = $"准备爬取信息。\n目标UP主: {Uploader.Nickname} (Uid:{Uploader.Uid})\n\n爬取主页视频信息中……\n";
+                ConsoleOutput = $"准备爬取信息。\n目标UP主: {Uploader.Nickname} (Uid:{Uploader.Uid})\n\n";
 
-                var videoKeywordQueryData = await BiliService.GetVideoKeywordQuery(httpClient, Uploader.Uid);
-                if (videoKeywordQueryData.Code != 0)
+                if (IsFetchVideos)
                 {
-                    ConsoleOutput += "爬取视频失败，请重试";
-                    return;
+                    await FetchVideoComments(httpClient);
                 }
 
-                var fullArchives = videoKeywordQueryData.Data.Archives;
-
-                var startText = StartDate.ToString("yyyy年MM月dd日 HH:mm:ss", CultureInfo.GetCultureInfo("zh-CN"));
-                var endText = EndDate.ToString("yyyy年MM月dd日 HH:mm:ss", CultureInfo.GetCultureInfo("zh-CN"));
-                ConsoleOutput += $"爬取全部视频成功。共获取到{fullArchives.Length}条视频。\n\n正在计算 {startText} 至 {endText} 发布的视频……";
-
-                var archives = new List<Archive>();
-                foreach (var item in fullArchives)
+                if (IsFetchSpaces)
                 {
-                    var videoDate = DateTimeOffset.FromUnixTimeSeconds(item.Pubdate);
-                    var isInRange = videoDate >= StartDate && videoDate <= EndDate;
-
-                    if (!isInRange)
-                    {
-                        continue;
-                    }
-
-                    var videoTimeText = videoDate.ToString("yyyy年MM月dd日 HH:mm:ss", CultureInfo.GetCultureInfo("zh-CN"));
-
-                    ConsoleOutput += $"添加待爬取视频：{item.Bvid}；\n视频标题：{item.Title}；\n发布时间：{videoTimeText}\n\n";
-                    archives.Add(item);
+                    await FetchSpacesComments(httpClient);
                 }
-
-                ConsoleOutput += "准备批量检索评论……\n";
-                foreach (var item in archives)
-                {
-                    ConsoleOutput += $"正在处理视频：{item.Bvid}；\n视频标题：{item.Title}\n";
-
-                    var isBreak = false;
-                    var nextOffset = "";
-                    while (!isBreak)
-                    {
-                        var lazyComment =
-                            await BiliService.GetLazyComment(httpClient, BiliService.CommentAreaType.Video, item.Aid,
-                                nextOffset);
-                        if (lazyComment.Code != 0)
-                        {
-                            ConsoleOutput += $"{item.Bvid} 获取失败。\n";
-                            continue;
-                        }
-
-                        foreach (var reply in lazyComment.Data.Replies)
-                        {
-                            if (reply == null)
-                            {
-                                continue;
-                            }
-
-                            var message = reply.Content.Message;
-
-                            var hasBlacklistedWord = Config.BlackList.Any(blacklistedWord =>
-                                (!Config.IsBlackHomonym && message.Contains(blacklistedWord)) ||
-                                (Config.IsBlackHomonym &&
-                                 HomophoneChecker.HasHomophone(message,
-                                     blacklistedWord)));
-
-                            var hasWhitelistedWord = Config.WhiteList.Any(whitelistedWord =>
-                                (!Config.IsWhiteHomonym && message.Contains(whitelistedWord)) ||
-                                (Config.IsWhiteHomonym &&
-                                 HomophoneChecker.HasHomophone(message,
-                                     whitelistedWord)));
-
-                            if ((Config.BlackList.Count > 0 && hasBlacklistedWord) ||
-                                (Config.WhiteList.Count > 0 && !hasWhitelistedWord))
-                            {
-                                continue;
-                            }
-
-                            message = EmoticonHelper.ProcessBilibiliEmoticon(message);
-
-                            var dateTime = DateTimeOffset.FromUnixTimeSeconds(reply.Ctime);
-                            var dateText = dateTime.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
-                            CommentsText += $"{dateText}\nid: {reply.Member.Uname}\n{message}\n\n";
-                            await Task.Delay(500);
-                        }
-
-                        if (lazyComment.Data.Cursor.IsEnd)
-                        {
-                            isBreak = true;
-                        }
-                        else
-                        {
-                            nextOffset = lazyComment.Data.Cursor.PaginationReply.NextOffset;
-                        }
-                    }
-                }
-
-                ConsoleOutput += "爬取完成。\n";
             }
             catch (Exception ex)
             {
@@ -154,7 +71,7 @@ public class ExportViewModel : ReactiveObject
                 ConsoleWriteLine(format);
             }
         });
-        
+
         LoadTextCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             try
@@ -187,7 +104,7 @@ public class ExportViewModel : ReactiveObject
             catch (Exception ex)
             {
                 ConsoleWriteLine($"加载文件失败：{ex}");
-                CommentsText = string.Empty; 
+                CommentsText = string.Empty;
             }
         });
 
@@ -228,15 +145,15 @@ public class ExportViewModel : ReactiveObject
                     ConsoleWriteLine("请在导出前输入文本。");
                     return;
                 }
-                
+
                 await SaveTextCommand.Execute();
-                
+
                 ConsoleWriteLine("启动FFMPEG进程……");
                 ConsoleWriteLine($"工作目录：{Environment.CurrentDirectory}");
 
                 const string ffmpegPath = "ffmpeg";
 
-                var arguments = VideoGenerateService.GetVideoArguments(SelectedResolution, SelectedPreset,
+                var arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset,
                     VideoDuration, SelectedFrameRate);
 
                 await VideoGenerateService.RunFfmpegAsync(ffmpegPath, arguments);
@@ -257,6 +174,149 @@ public class ExportViewModel : ReactiveObject
         SelectedResolution = ResolutionOptions[0];
         SelectedFrameRate = FrameRateOptions[2];
         SelectedPreset = PresetOptions[2];
+    }
+
+    private async Task FetchVideoComments(HttpClient httpClient)
+    {
+        ConsoleOutput += "爬取主页视频信息中……\n";
+        var videoKeywordQueryData = await BiliService.GetVideoKeywordQuery(httpClient, Uploader.Uid);
+        if (videoKeywordQueryData.Code != 0)
+        {
+            ConsoleOutput += $"Code: {videoKeywordQueryData.Code}\n爬取视频失败！";
+            return;
+        }
+
+        var fullArchives = videoKeywordQueryData.Data.Archives;
+
+        var startText = StartDate.ToString("yyyy年MM月dd日 HH:mm:ss", CultureInfo.GetCultureInfo("zh-CN"));
+        var endText = EndDate.ToString("yyyy年MM月dd日 HH:mm:ss", CultureInfo.GetCultureInfo("zh-CN"));
+        ConsoleOutput += $"爬取全部视频成功。共获取到{fullArchives.Length}条视频。\n\n正在计算 {startText} 至 {endText} 发布的视频……";
+
+        var archives = new List<Archive>();
+        foreach (var item in fullArchives)
+        {
+            var videoDate = DateTimeOffset.FromUnixTimeSeconds(item.Pubdate);
+            var isInRange = videoDate >= StartDate && videoDate <= EndDate;
+
+            if (!isInRange)
+            {
+                continue;
+            }
+
+            var videoTimeText = videoDate.ToString("yyyy年MM月dd日 HH:mm:ss", CultureInfo.GetCultureInfo("zh-CN"));
+
+            ConsoleOutput += $"添加待爬取视频：{item.Bvid}；\n视频标题：{item.Title}；\n发布时间：{videoTimeText}\n\n";
+            archives.Add(item);
+        }
+
+        ConsoleOutput += "准备批量检索评论……\n";
+        foreach (var item in archives)
+        {
+            ConsoleOutput += $"正在处理视频：{item.Bvid}；\n视频标题：{item.Title}\n";
+
+            var isBreak = false;
+            var nextOffset = "";
+            while (!isBreak)
+            {
+                var lazyComment =
+                    await BiliService.GetLazyComment(httpClient, BiliService.CommentAreaType.Video, item.Aid,
+                        nextOffset);
+                if (lazyComment.Code != 0)
+                {
+                    ConsoleOutput += $"{item.Bvid} 获取失败。\n";
+                    continue;
+                }
+
+                foreach (var reply in lazyComment.Data.Replies)
+                {
+                    if (reply == null)
+                    {
+                        continue;
+                    }
+                    
+                    var dateTime = DateTimeOffset.FromUnixTimeSeconds(reply.Ctime);
+
+                    if (IsExcludeOutOfRangeComments)
+                    {
+                        var isInRange = dateTime >= StartDate && dateTime <= EndDate;
+
+                        if (!isInRange)
+                        {
+                            continue;
+                        }
+                    }
+                    
+                    var message = reply.Content.Message;
+
+                    var hasBlacklistedWord = Config.BlackList.Any(blacklistedWord =>
+                        (!Config.IsBlackHomonym && message.Contains(blacklistedWord)) ||
+                        (Config.IsBlackHomonym &&
+                         HomophoneChecker.HasHomophone(message,
+                             blacklistedWord)));
+
+                    var hasWhitelistedWord = Config.WhiteList.Any(whitelistedWord =>
+                        (!Config.IsWhiteHomonym && message.Contains(whitelistedWord)) ||
+                        (Config.IsWhiteHomonym &&
+                         HomophoneChecker.HasHomophone(message,
+                             whitelistedWord)));
+
+                    if ((Config.BlackList.Count > 0 && hasBlacklistedWord) ||
+                        (Config.WhiteList.Count > 0 && !hasWhitelistedWord))
+                    {
+                        continue;
+                    }
+
+                    message = EmoticonHelper.ProcessBilibiliEmoticon(message);
+
+                    var dateText = dateTime.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+                    CommentsText += $"{dateText}\nid: {reply.Member.Uname}\n{message}\n\n";
+                    await Task.Delay(500);
+                }
+
+                if (lazyComment.Data.Cursor.IsEnd)
+                {
+                    isBreak = true;
+                }
+                else
+                {
+                    nextOffset = lazyComment.Data.Cursor.PaginationReply.NextOffset;
+                }
+
+                if (isBreak)
+                {
+                    continue;
+                }
+
+                await Task.Delay(5000);
+                ConsoleOutput += $"正在爬取页{lazyComment.Data.Cursor.Next}……\n";
+            }
+        }
+
+        ConsoleOutput += "视频爬取完成。\n";
+        return;
+    }
+
+    private async Task FetchSpacesComments(HttpClient httpClient)
+    {
+        ConsoleOutput += "爬取主页动态信息中……\n";
+        
+    }
+    public bool IsExcludeOutOfRangeComments
+    {
+        get => _isExcludeOutOfRangeComments;
+        set => this.RaiseAndSetIfChanged(ref _isExcludeOutOfRangeComments, value);
+    }
+
+    public bool IsFetchVideos
+    {
+        get => _isFetchVideos;
+        set => this.RaiseAndSetIfChanged(ref _isFetchVideos, value);
+    }
+
+    public bool IsFetchSpaces
+    {
+        get => _isFetchSpaces;
+        set => this.RaiseAndSetIfChanged(ref _isFetchSpaces, value);
     }
 
     private DateTimeOffset StartDate

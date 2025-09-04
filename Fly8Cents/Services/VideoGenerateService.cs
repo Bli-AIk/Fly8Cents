@@ -9,7 +9,7 @@ namespace Fly8Cents.Services;
 
 public static class VideoGenerateService
 {
-    public static string GetVideoArguments(string resolution, string preset, double duration, int frameRate)
+    public static string GetVideo2Arguments(string resolution, string preset, double duration, int frameRate)
     {
         var exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
        
@@ -20,7 +20,7 @@ public static class VideoGenerateService
 
         var fullFontPath = Path.Combine(exeDir, "Assets/Fonts/Font.otf");
         var fullTextFile = Path.Combine(exeDir, "Comments.txt");
-        var outputPath = Path.Combine(exeDir, "output.mp4");
+        var outputPath = Path.Combine(exeDir, "output_2.mp4");
 
         var dimensions = resolution.Split('x');
 

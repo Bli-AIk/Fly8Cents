@@ -10,9 +10,24 @@
     <Grid Margin="10" RowDefinitions="Auto,*,Auto" RowSpacing="10">
         <!-- 顶部爬取评论 + 控制台输出 -->
         <StackPanel Grid.Row="0" Orientation="Vertical" Spacing="5">
-            <Button Content="爬取评论"
-                    Command="{Binding FetchCommentsCommand}"
-                    HorizontalAlignment="Left" />
+            <Grid ColumnDefinitions="*,*">
+                <StackPanel Orientation="Horizontal" Spacing="5" Grid.Column="0">
+                    <Button Content="爬取评论"
+                            Command="{Binding FetchCommentsCommand}" />
+                    <CheckBox Content="剔除时间范围外的评论" Margin="5,0"
+                              IsChecked="{Binding IsExcludeOutOfRangeComments}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            Spacing="5"
+                            HorizontalAlignment="Right"
+                            Grid.Column="1">
+                    <CheckBox Content="爬取视频" Margin="5,0"
+                              IsChecked="{Binding IsFetchVideos}"/>
+                    <CheckBox Content="爬取动态" Margin="5,0" 
+                              IsChecked="{Binding IsFetchSpaces}"/>
+                </StackPanel>
+            </Grid>
 
             <ScrollViewer Height="100" VerticalScrollBarVisibility="Auto">
                 <TextBlock Text="{Binding ConsoleOutput}" 
