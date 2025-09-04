@@ -176,131 +176,6 @@ public class ExportViewModel : ReactiveObject
         SelectedPreset = PresetOptions[2];
     }
 
-    private async Task FetchVideoComments(HttpClient httpClient)
-    {
-        ConsoleOutput += "爬取主页视频信息中……\n";
-        var videoKeywordQueryData = await BiliService.GetVideoKeywordQuery(httpClient, Uploader.Uid);
-        if (videoKeywordQueryData.Code != 0)
-        {
-            ConsoleOutput += $"Code: {videoKeywordQueryData.Code}\n爬取视频失败！";
-            return;
-        }
-
-        var fullArchives = videoKeywordQueryData.Data.Archives;
-
-        var startText = StartDate.ToString("yyyy年MM月dd日 HH:mm:ss", CultureInfo.GetCultureInfo("zh-CN"));
-        var endText = EndDate.ToString("yyyy年MM月dd日 HH:mm:ss", CultureInfo.GetCultureInfo("zh-CN"));
-        ConsoleOutput += $"爬取全部视频成功。共获取到{fullArchives.Length}条视频。\n\n正在计算 {startText} 至 {endText} 发布的视频……";
-
-        var archives = new List<Archive>();
-        foreach (var item in fullArchives)
-        {
-            var videoDate = DateTimeOffset.FromUnixTimeSeconds(item.Pubdate);
-            var isInRange = videoDate >= StartDate && videoDate <= EndDate;
-
-            if (!isInRange)
-            {
-                continue;
-            }
-
-            var videoTimeText = videoDate.ToString("yyyy年MM月dd日 HH:mm:ss", CultureInfo.GetCultureInfo("zh-CN"));
-
-            ConsoleOutput += $"添加待爬取视频：{item.Bvid}；\n视频标题：{item.Title}；\n发布时间：{videoTimeText}\n\n";
-            archives.Add(item);
-        }
-
-        ConsoleOutput += "准备批量检索评论……\n";
-        foreach (var item in archives)
-        {
-            ConsoleOutput += $"正在处理视频：{item.Bvid}；\n视频标题：{item.Title}\n";
-
-            var isBreak = false;
-            var nextOffset = "";
-            while (!isBreak)
-            {
-                var lazyComment =
-                    await BiliService.GetLazyComment(httpClient, BiliService.CommentAreaType.Video, item.Aid,
-                        nextOffset);
-                if (lazyComment.Code != 0)
-                {
-                    ConsoleOutput += $"{item.Bvid} 获取失败。\n";
-                    continue;
-                }
-
-                foreach (var reply in lazyComment.Data.Replies)
-                {
-                    if (reply == null)
-                    {
-                        continue;
-                    }
-                    
-                    var dateTime = DateTimeOffset.FromUnixTimeSeconds(reply.Ctime);
-
-                    if (IsExcludeOutOfRangeComments)
-                    {
-                        var isInRange = dateTime >= StartDate && dateTime <= EndDate;
-
-                        if (!isInRange)
-                        {
-                            continue;
-                        }
-                    }
-                    
-                    var message = reply.Content.Message;
-
-                    var hasBlacklistedWord = Config.BlackList.Any(blacklistedWord =>
-                        (!Config.IsBlackHomonym && message.Contains(blacklistedWord)) ||
-                        (Config.IsBlackHomonym &&
-                         HomophoneChecker.HasHomophone(message,
-                             blacklistedWord)));
-
-                    var hasWhitelistedWord = Config.WhiteList.Any(whitelistedWord =>
-                        (!Config.IsWhiteHomonym && message.Contains(whitelistedWord)) ||
-                        (Config.IsWhiteHomonym &&
-                         HomophoneChecker.HasHomophone(message,
-                             whitelistedWord)));
-
-                    if ((Config.BlackList.Count > 0 && hasBlacklistedWord) ||
-                        (Config.WhiteList.Count > 0 && !hasWhitelistedWord))
-                    {
-                        continue;
-                    }
-
-                    message = EmoticonHelper.ProcessBilibiliEmoticon(message);
-
-                    var dateText = dateTime.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
-                    CommentsText += $"{dateText}\nid: {reply.Member.Uname}\n{message}\n\n";
-                    await Task.Delay(500);
-                }
-
-                if (lazyComment.Data.Cursor.IsEnd)
-                {
-                    isBreak = true;
-                }
-                else
-                {
-                    nextOffset = lazyComment.Data.Cursor.PaginationReply.NextOffset;
-                }
-
-                if (isBreak)
-                {
-                    continue;
-                }
-
-                await Task.Delay(5000);
-                ConsoleOutput += $"正在爬取页{lazyComment.Data.Cursor.Next}……\n";
-            }
-        }
-
-        ConsoleOutput += "视频爬取完成。\n";
-        return;
-    }
-
-    private async Task FetchSpacesComments(HttpClient httpClient)
-    {
-        ConsoleOutput += "爬取主页动态信息中……\n";
-        
-    }
     public bool IsExcludeOutOfRangeComments
     {
         get => _isExcludeOutOfRangeComments;
@@ -417,6 +292,208 @@ public class ExportViewModel : ReactiveObject
     public ReactiveCommand<Unit, Unit> LoadTextCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveTextCommand { get; }
     public ReactiveCommand<Unit, Unit> ExportCommentsCommand { get; }
+
+    private async Task FetchVideoComments(HttpClient httpClient)
+    {
+        ConsoleOutput += "爬取主页视频信息中……\n";
+        var videoKeywordQueryData = await BiliService.GetVideoKeywordQuery(httpClient, Uploader.Uid);
+        if (videoKeywordQueryData.Code != 0)
+        {
+            ConsoleOutput += $"Code: {videoKeywordQueryData.Code}\n爬取视频失败！";
+            return;
+        }
+
+        var fullArchives = videoKeywordQueryData.Data.Archives;
+
+        var startText = StartDate.ToString("yyyy年MM月dd日 HH:mm:ss", CultureInfo.GetCultureInfo("zh-CN"));
+        var endText = EndDate.ToString("yyyy年MM月dd日 HH:mm:ss", CultureInfo.GetCultureInfo("zh-CN"));
+        ConsoleOutput += $"爬取全部视频成功。共获取到{fullArchives.Length}条视频。\n\n正在计算 {startText} 至 {endText} 发布的视频……";
+
+        var archives = new List<Archive>();
+        foreach (var item in fullArchives)
+        {
+            var videoDate = DateTimeOffset.FromUnixTimeSeconds(item.Pubdate);
+            var isInRange = videoDate >= StartDate && videoDate <= EndDate;
+
+            if (!isInRange)
+            {
+                continue;
+            }
+
+            var videoTimeText = videoDate.ToString("yyyy年MM月dd日 HH:mm:ss", CultureInfo.GetCultureInfo("zh-CN"));
+
+            ConsoleOutput += $"添加待爬取视频：{item.Bvid}；\n视频标题：{item.Title}；\n发布时间：{videoTimeText}\n\n";
+            archives.Add(item);
+        }
+
+        ConsoleOutput += "准备批量检索评论……\n";
+        foreach (var item in archives)
+        {
+            await OutputComment(httpClient,
+                BiliService.CommentAreaType.Video, item.Aid,
+                $"正在处理视频：{item.Bvid}；\n视频标题：{item.Title}\n",
+                $"{item.Bvid} 爬取成功。\n",
+                $"{item.Bvid} 爬取失败。\n");
+        }
+
+        ConsoleOutput += "视频爬取完成。\n";
+    }
+
+    private async Task OutputComment(HttpClient httpClient,
+        BiliService.CommentAreaType commentAreaType,
+        long oid,
+        string startConsole,
+        string successConsole,
+        string errorConsole)
+    {
+        ConsoleOutput += startConsole;
+
+        var isBreak = false;
+        var nextOffset = "";
+        while (!isBreak)
+        {
+            var lazyComment =
+                await BiliService.GetLazyComment(httpClient, commentAreaType, oid, nextOffset);
+            if (lazyComment.Code != 0)
+            {
+                ConsoleOutput += errorConsole;
+                continue;
+            }
+            ConsoleOutput += successConsole;
+
+            foreach (var reply in lazyComment.Data.Replies)
+            {
+                if (reply == null)
+                {
+                    continue;
+                }
+
+                var dateTime = DateTimeOffset.FromUnixTimeSeconds(reply.Ctime);
+
+                if (IsExcludeOutOfRangeComments)
+                {
+                    var isInRange = dateTime >= StartDate && dateTime <= EndDate;
+
+                    if (!isInRange)
+                    {
+                        continue;
+                    }
+                }
+
+                var message = reply.Content.Message;
+
+                var hasBlacklistedWord = Config.BlackList.Any(blacklistedWord =>
+                    (!Config.IsBlackHomonym && message.Contains(blacklistedWord)) ||
+                    (Config.IsBlackHomonym &&
+                     HomophoneChecker.HasHomophone(message,
+                         blacklistedWord)));
+
+                var hasWhitelistedWord = Config.WhiteList.Any(whitelistedWord =>
+                    (!Config.IsWhiteHomonym && message.Contains(whitelistedWord)) ||
+                    (Config.IsWhiteHomonym &&
+                     HomophoneChecker.HasHomophone(message,
+                         whitelistedWord)));
+
+                if ((Config.BlackList.Count > 0 && hasBlacklistedWord) ||
+                    (Config.WhiteList.Count > 0 && !hasWhitelistedWord))
+                {
+                    continue;
+                }
+
+                message = EmoticonHelper.ProcessBilibiliEmoticon(message);
+
+                var dateText = dateTime.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+                CommentsText += $"{dateText}\nid: {reply.Member.Uname}\n{message}\n\n";
+                await Task.Delay(500);
+            }
+
+            if (lazyComment.Data.Cursor.IsEnd)
+            {
+                isBreak = true;
+            }
+            else
+            {
+                nextOffset = lazyComment.Data.Cursor.PaginationReply.NextOffset;
+            }
+
+            if (isBreak)
+            {
+                continue;
+            }
+
+            ConsoleOutput += "爬取完毕，请稍候……\n";
+            await Task.Delay(5000);
+            ConsoleOutput += $"正在爬取页{lazyComment.Data.Cursor.Next}……\n";
+        }
+    }
+
+    private async Task FetchSpacesComments(HttpClient httpClient)
+    {
+        ConsoleOutput += "爬取主页动态信息中……\n";
+        long? offset = null;
+        var isBreak = false;
+
+        while (!isBreak)
+        {
+            var userSpaceData = await BiliService.GetUserSpace(httpClient, Uploader.Uid, offset);
+            if (userSpaceData.Code != 0)
+            {
+                ConsoleOutput += $"Code: {userSpaceData.Code} 爬取动态失败！\n";
+                return;
+            }
+
+            ConsoleOutput += $"Code: {userSpaceData.Code} 爬取动态成功。\n";
+
+            if (long.TryParse(userSpaceData.Data.Offset, out var newOffset))
+            {
+                offset = newOffset;
+            }
+            else
+            {
+                isBreak = true;
+            }
+
+            foreach (var item in userSpaceData.Data.Items)
+            {
+                var itemTime = DateTimeOffset.FromUnixTimeSeconds(item.Modules.ModuleAuthor.PubTs);
+
+                var isInRange = itemTime >= StartDate && itemTime <= EndDate;
+
+                if (!isInRange)
+                {
+                    if (item.Modules.ModuleTag is { Text: "置顶" })
+                    {
+                        continue;
+                    }
+                    
+                    isBreak = true;
+                    break;
+                }
+                
+                var basicCommentType = (BiliService.CommentAreaType)item.Basic.CommentType;
+
+                if (basicCommentType is not (BiliService.CommentAreaType.Album or BiliService.CommentAreaType.Dynamic))
+                {
+                    continue;
+                }
+
+                if (!long.TryParse(item.Basic.CommentIdStr, out var id))
+                {
+                    continue;
+                }
+
+                var itemTimeText = itemTime.ToString("yyyy年MM月dd日 HH:mm:ss", CultureInfo.GetCultureInfo("zh-CN"));
+                await OutputComment(httpClient,
+                    basicCommentType, id,
+                    $"正在处理动态：{id}；发布时间：{itemTimeText}\n",
+                    $"{id} 爬取成功。\n",
+                    $"{id} 爬取失败。\n");
+            }
+
+            await Task.Delay(5000);
+        }
+        ConsoleOutput += "动态爬取完成。\n";
+    }
 
     private void ConsoleWriteLine(string format)
     {

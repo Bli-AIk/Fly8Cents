@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using QuickType.LazyComment;
+using QuickType.UserSpaceData;
 using QuickType.UserSpaceDetails;
 using QuickType.VideoKeywordQuery;
 
@@ -120,6 +121,43 @@ public static class BiliService
     }
 
     /// <summary>
+    ///     获取用户空间动态。
+    /// </summary>
+    /// <param name="httpClient">HttpClient 实例</param>
+    /// <param name="mid">用户 UID</param>
+    /// <param name="offset">分页偏移量</param>
+    /// <returns>UserSpaceData</returns>
+    /// <remarks>
+    ///     参考：
+    ///     <see href="https://socialsisteryi.github.io/bilibili-API-collect/docs/dynamic/space.html" />
+    /// </remarks>
+    public static async Task<UserSpaceData> GetUserSpace(HttpClient httpClient,
+        long mid,
+        long? offset)
+    {
+        const string baseUrl = "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space";
+
+        var query = new Dictionary<string, string>
+        {
+            { "host_mid", mid.ToString() }
+        };
+
+        if (offset.HasValue)
+        {
+            query.Add("offset", offset.Value.ToString());
+        }
+
+        var queryString = string.Join("&", query.Select(kvp =>
+            $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}"));
+
+        var requestUri = $"{baseUrl}?{queryString}";
+
+        Console.WriteLine("RequestUri: " + requestUri);
+        var response = await httpClient.GetStringAsync(requestUri);
+        return UserSpaceData.FromJson(response);
+    }
+
+    /// <summary>
     ///     获取评论区明细（懒加载）。
     /// </summary>
     /// <param name="httpClient">HttpClient 实例</param>
@@ -155,7 +193,7 @@ public static class BiliService
         var paginationObject = new { offset = nextOffset };
         var paginationJson = JsonConvert.SerializeObject(paginationObject);
         parameters.Add("pagination_str", paginationJson);
-        
+
         var signedParams = await BiliWbiService.SignAsync(parameters);
 
         var query = await new FormUrlEncodedContent(signedParams).ReadAsStringAsync();

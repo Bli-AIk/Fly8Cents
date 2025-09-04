@@ -14,29 +14,29 @@ namespace Fly8Cents.Services;
 public static class HomophoneChecker
 {
     /// <summary>
-    ///     检查 textB 的拼音序列是否连续出现在 textA 的拼音序列中，考虑到多音字。
+    ///     检查 shortText 的拼音序列是否连续出现在 longText 的拼音序列中，考虑到多音字。
     /// </summary>
-    /// <param name="textA">较长的文本。</param>
-    /// <param name="textB">较短的文本。</param>
+    /// <param name="longText">较长的文本。</param>
+    /// <param name="shortText">较短的文本。</param>
     /// <param name="format">拼音格式。</param>
-    /// <returns>如果 textB 的拼音连续出现在 textA 中，则返回 true；否则返回 false。</returns>
-    public static bool HasHomophone(string textA,
-        string textB,
+    /// <returns>如果 shortText 的拼音连续出现在 longText 中，则返回 true；否则返回 false。</returns>
+    public static bool HasHomophone(string longText,
+        string shortText,
         PinyinFormat format = PinyinFormat.WITHOUT_TONE | PinyinFormat.WITH_V)
     {
-        if (string.IsNullOrEmpty(textA) || string.IsNullOrEmpty(textB))
+        if (string.IsNullOrEmpty(longText) || string.IsNullOrEmpty(shortText))
         {
             return false;
         }
 
-        // 确保 arrA 总是较长或长度相等
-        if (textA.Length < textB.Length)
+        // 舍弃长度颠倒的情况
+        if (longText.Length < shortText.Length)
         {
-            (textA, textB) = (textB, textA);
+            return false;
         }
 
-        var arrA = Pinyin4Net.GetPinyinArray(textA, format);
-        var arrB = Pinyin4Net.GetPinyinArray(textB, format);
+        var arrA = Pinyin4Net.GetPinyinArray(longText, format);
+        var arrB = Pinyin4Net.GetPinyinArray(shortText, format);
 
         // 如果 arrA 的长度小于 arrB，直接返回 false
         if (arrA.Count < arrB.Count)
