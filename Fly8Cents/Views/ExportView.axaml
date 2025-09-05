@@ -80,11 +80,21 @@
                 <TextBlock Grid.Column="1" Text="{Binding EstimatedTimeText}" HorizontalAlignment="Right"/>
             </Grid>
             <!-- 导出按钮 -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="读取文本" Command="{Binding LoadTextCommand}" Margin="5,0" />
-                <Button Content="保存文本" Command="{Binding SaveTextCommand}" Margin="5,0" />
-                <Button Content="导出视频" Command="{Binding ExportCommentsCommand}" />
-            </StackPanel>
+
+            <Grid ColumnDefinitions="*,*">
+                
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <CheckBox Content="导出开头" IsChecked="{Binding IsExportStart  }" Margin="5,0" />
+                    <CheckBox Content="导出正片" IsChecked="{Binding IsExportFeature }" Margin="5,0" />
+                    <CheckBox Content="导出结尾" IsChecked="{Binding IsExportEnd }" />
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="读取文本" Command="{Binding LoadTextCommand}" Margin="5,0" />
+                    <Button Content="保存文本" Command="{Binding SaveTextCommand}" Margin="5,0" />
+                    <Button Content="导出视频" Command="{Binding ExportCommentsCommand}" />
+                </StackPanel>
+            </Grid>
 
         </StackPanel>
     </Grid>

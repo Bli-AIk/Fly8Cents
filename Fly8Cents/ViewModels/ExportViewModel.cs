@@ -24,6 +24,10 @@ public class ExportViewModel : ReactiveObject
 
     private DateTimeOffset _endDate = DateTimeOffset.Now;
     private bool _isExcludeOutOfRangeComments;
+
+    private bool _isExportStart = true;
+    private bool _isExportFeature = true;
+    private bool _isExportEnd = true;
     private bool _isFetchSpaces = true;
     private bool _isFetchVideos = true;
     private int _selectedFrameRate;
@@ -200,29 +204,50 @@ public class ExportViewModel : ReactiveObject
                 ImageStitcher.DeleteImages(lineCount);
                 ConsoleWriteLine("清理完毕。");
 
-                ConsoleWriteLine("开始导出视频1（片头）。");
-                var video1Arguments =
-                    VideoGenerateService.GetVideo1Arguments(SelectedResolution, SelectedPreset, SelectedFrameRate,
-                        TextSettings.StartText);
-                await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video1Arguments);
-                ConsoleWriteLine("视频1（片头）导出完毕。");
+                if (IsExportStart)
+                {
+                    ConsoleWriteLine("开始导出视频1（片头）。");
+                    var video1Arguments =
+                        VideoGenerateService.GetVideo1Arguments(SelectedResolution, SelectedPreset, SelectedFrameRate,
+                            TextSettings.StartText);
+                    await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video1Arguments);
+                    ConsoleWriteLine("视频1（片头）导出完毕。");
+                }
+                else
+                {
+                    ConsoleWriteLine("跳过视频1（片头）导出。");
+                }
 
-                ConsoleWriteLine("开始导出视频3（片尾）。");
-                var video3Arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset,
-                    SelectedFrameRate, VideoDuration);
-                await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video3Arguments);
-                ConsoleWriteLine("视频3（片尾）导出完毕。");
+                if (IsExportEnd)
+                {
+                    ConsoleWriteLine("开始导出视频3（片尾）。");
+                    var video3Arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset,
+                        SelectedFrameRate, VideoDuration);
+                    await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video3Arguments);
+                    ConsoleWriteLine("视频3（片尾）导出完毕。");
+                }
+                else
+                {
+                    ConsoleWriteLine("跳过视频3（片尾）导出。");
+                }
 
-                ConsoleWriteLine("开始导出视频2（正片）。");
-                var video2Arguments =
-                    VideoGenerateService.GetVideo3Arguments(SelectedResolution, SelectedPreset, SelectedFrameRate,
-                        TextSettings.EndText);
-                await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video2Arguments);
-                ConsoleWriteLine("视频2（正片）导出完毕。");
-
+                if (IsExportFeature)
+                {
+                    ConsoleWriteLine("开始导出视频2（正片）。");
+                    var video2Arguments =
+                        VideoGenerateService.GetVideo3Arguments(SelectedResolution, SelectedPreset, SelectedFrameRate,
+                            TextSettings.EndText);
+                    await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video2Arguments);
+                    ConsoleWriteLine("视频2（正片）导出完毕。");
+                }
+                else
+                {
+                    ConsoleWriteLine("跳过视频2（正片）导出。");
+                }
+                
                 ConsoleWriteLine("所有视频导出完毕。\n正在合并……");
-                
-                
+
+
                 var exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
                 if (exeDir == null)
@@ -283,6 +308,24 @@ public class ExportViewModel : ReactiveObject
     {
         get => _isFetchSpaces;
         set => this.RaiseAndSetIfChanged(ref _isFetchSpaces, value);
+    }
+
+    public bool IsExportStart
+    {
+        get => _isExportStart;
+        set => this.RaiseAndSetIfChanged(ref _isExportStart, value);
+    }
+
+    public bool IsExportFeature
+    {
+        get => _isExportFeature;
+        set => this.RaiseAndSetIfChanged(ref _isExportFeature, value);
+    }
+
+    public bool IsExportEnd
+    {
+        get => _isExportEnd;
+        set => this.RaiseAndSetIfChanged(ref _isExportEnd, value);
     }
 
     private DateTimeOffset StartDate
