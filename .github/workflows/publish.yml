@@ -57,11 +57,11 @@ jobs:
       - name: Get tag version
         id: tag
         run: |
-          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
-            echo "::set-output name=tag::manual-$(date +%Y%m%d%H%M)"
-          } else {
-            echo "::set-output name=tag::$(git describe --tags --always)"
-          }
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          echo "::set-output name=tag::manual-$(date +%Y%m%d%H%M)"
+          else
+          echo "::set-output name=tag::$(git describe --tags --always)"
+          fi
 
       - name: Create archives
         shell: pwsh
