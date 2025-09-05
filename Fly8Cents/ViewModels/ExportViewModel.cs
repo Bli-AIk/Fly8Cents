@@ -334,13 +334,14 @@ public class ExportViewModel : ReactiveObject
 
     private DateTimeOffset StartDate
     {
-        get => _startDate;
+        get => new(_startDate.Year, _startDate.Month, _startDate.Day, 0, 0, 0, _startDate.Offset);
         set => this.RaiseAndSetIfChanged(ref _startDate, value);
     }
 
     private DateTimeOffset EndDate
     {
-        get => _endDate;
+        
+        get => new(_endDate.Year, _endDate.Month, _endDate.Day, 23, 60, 60, _endDate.Offset);
         set => this.RaiseAndSetIfChanged(ref _endDate, value);
     }
 
