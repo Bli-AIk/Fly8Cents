@@ -17,6 +17,7 @@ namespace Fly8Cents.ViewModels;
 
 public class ExportViewModel : ReactiveObject
 {
+    private readonly ObservableAsPropertyHelper<string> _estimatedTimeText;
     private string _commentsText = "";
     private ConfigModel _config = new();
     private string _consoleOutput = "";
@@ -33,6 +34,8 @@ public class ExportViewModel : ReactiveObject
 
     private DateTimeOffset _startDate = DateTimeOffset.Now.AddDays(-7);
 
+    private TextSettingsModel _textSettings = new();
+
     private UploaderInfoModel _uploader = new();
     private int _videoDuration = 60;
 
@@ -46,11 +49,12 @@ public class ExportViewModel : ReactiveObject
                     return "";
                 }
 
-                var lines = VideoGenerateService.WrapString(text).Split([Environment.NewLine], StringSplitOptions.None).Length;
+                var lines = VideoGenerateService.WrapString(text).Split([Environment.NewLine], StringSplitOptions.None)
+                    .Length;
                 return $"格式化后行数：{lines}。预计导出时长为{lines * 2}秒。";
             })
             .ToProperty(this, x => x.EstimatedTimeText);
-        
+
         MessageBus.Current.Listen<UploaderInfoModel>()
             .Subscribe(uploader => { Uploader = uploader; });
         MessageBus.Current.Listen<ConfigModel>()
@@ -59,6 +63,8 @@ public class ExportViewModel : ReactiveObject
             .Subscribe(startDate => { StartDate = startDate; });
         MessageBus.Current.Listen<DateTimeOffset>("EndDate")
             .Subscribe(endDate => { EndDate = endDate; });
+        MessageBus.Current.Listen<TextSettingsModel>()
+            .Subscribe(textSettings => { TextSettings = textSettings; });
 
         FetchCommentsCommand = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -171,7 +177,6 @@ public class ExportViewModel : ReactiveObject
                 var lineCount = -1;
                 using (var reader = new StringReader(formattedText))
                 {
-
                     while (reader.ReadLine() is { } formattedTextLine)
                     {
                         lineCount++;
@@ -188,28 +193,34 @@ public class ExportViewModel : ReactiveObject
                         ConsoleWriteLine($"第{lineCount}张文本图片导出完毕。");
                     }
                 }
+
                 ConsoleWriteLine("所有文本图片导出完毕。\n准备拼接……");
-            
+
                 ImageStitcher.StitchImages(lineCount);
                 ConsoleWriteLine("拼接完毕。\n正在清理冗余图片…");
                 ImageStitcher.DeleteImages(lineCount);
                 ConsoleWriteLine("清理完毕。");
-                
+
                 ConsoleWriteLine("开始导出视频1（片头）。");
-                var video1Arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset, SelectedFrameRate, VideoDuration);
+                var video1Arguments =
+                    VideoGenerateService.GetVideo1Arguments(SelectedResolution, SelectedPreset, SelectedFrameRate,
+                        TextSettings.StartText);
                 await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video1Arguments);
                 ConsoleWriteLine("视频1（片头）导出完毕。");
-                
+
                 ConsoleWriteLine("开始导出视频3（片尾）。");
-                var video3Arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset, SelectedFrameRate, VideoDuration);
+                var video3Arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset,
+                    SelectedFrameRate, VideoDuration);
                 await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video3Arguments);
                 ConsoleWriteLine("视频3（片尾）导出完毕。");
-                
+
                 ConsoleWriteLine("开始导出视频2（正片）。");
-                var video2Arguments = VideoGenerateService.GetVideo2Arguments(SelectedResolution, SelectedPreset, SelectedFrameRate, VideoDuration);
+                var video2Arguments =
+                    VideoGenerateService.GetVideo3Arguments(SelectedResolution, SelectedPreset, SelectedFrameRate,
+                        TextSettings.EndText);
                 await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video2Arguments);
                 ConsoleWriteLine("视频2（正片）导出完毕。");
-                
+
                 ConsoleWriteLine("所有视频导出完毕。");
             }
             catch (Exception ex)
@@ -227,6 +238,12 @@ public class ExportViewModel : ReactiveObject
         SelectedResolution = ResolutionOptions[0];
         SelectedFrameRate = FrameRateOptions[2];
         SelectedPreset = PresetOptions[2];
+    }
+
+    public TextSettingsModel TextSettings
+    {
+        get => _textSettings;
+        set => this.RaiseAndSetIfChanged(ref _textSettings, value);
     }
 
     public bool IsExcludeOutOfRangeComments
@@ -309,7 +326,6 @@ public class ExportViewModel : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _commentsText, value);
     }
 
-    private readonly ObservableAsPropertyHelper<string> _estimatedTimeText;
     public string EstimatedTimeText => _estimatedTimeText.Value;
 
     // 视频参数属性
