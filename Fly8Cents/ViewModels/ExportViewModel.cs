@@ -170,7 +170,6 @@ public class ExportViewModel : ReactiveObject
                 ConsoleWriteLine("文本格式化完毕。");
 
                 ConsoleWriteLine("准备启动FFMPEG进程……");
-                ConsoleWriteLine($"工作目录：{Environment.CurrentDirectory}");
 
                 const string ffmpegPath = "ffmpeg";
 
@@ -221,7 +220,29 @@ public class ExportViewModel : ReactiveObject
                 await VideoGenerateService.RunFfmpegAsync(ffmpegPath, video2Arguments);
                 ConsoleWriteLine("视频2（正片）导出完毕。");
 
-                ConsoleWriteLine("所有视频导出完毕。");
+                ConsoleWriteLine("所有视频导出完毕。\n正在合并……");
+                
+                
+                var exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+                if (exeDir == null)
+                {
+                    throw new InvalidOperationException("无法获取当前程序集所在目录。");
+                }
+
+                var output1Path = Path.Combine(exeDir, "output_1.mp4");
+                var output2Path = Path.Combine(exeDir, "output_2.mp4");
+                var output3Path = Path.Combine(exeDir, "output_3.mp4");
+                var outputPath = Path.Combine(exeDir, "output.mp4");
+                var outputWithAudioPath = Path.Combine(exeDir, "output_with_audio.mp4");
+                var bgmPath = Path.Combine(exeDir, "Assets/Audios/Bgm.mp3");
+                await VideoGenerateService.RunFfmpegAsync(ffmpegPath,
+                    $"-i \"{output1Path}\" -i \"{output2Path}\" -i \"{output3Path}\" -filter_complex \"[0:v][1:v][2:v]concat=n=3:v=1:a=0[outv]\" -map \"[outv]\" \"{outputPath}\" -y -progress pipe:1");
+                ConsoleWriteLine("合并完成。正在生成带有Bgm的副本……");
+                await VideoGenerateService.RunFfmpegAsync(ffmpegPath,
+                    $"-i \"{outputPath}\" -stream_loop -1 -i \"{bgmPath}\" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -shortest \"{outputWithAudioPath}\".mp4 -y -progress pipe:1");
+                ConsoleWriteLine("副本已生成。");
+                ConsoleWriteLine("导出完毕！请在软件同级目录下获取成片，开始欣赏吧～");
             }
             catch (Exception ex)
             {

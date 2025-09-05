@@ -48,6 +48,10 @@
         <None Include="Assets\Fonts\Font.otf">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+
+        <None Include="Assets\Audios\Bgm.mp3">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>
