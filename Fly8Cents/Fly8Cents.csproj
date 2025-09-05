@@ -10,24 +10,25 @@
 
     <ItemGroup>
         <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Remove=".github\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.3.2"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.3.2"/>
-        <PackageReference Include="Avalonia.Labs.Qr" Version="11.3.1"/>
-        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.2"/>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.2"/>
+        <PackageReference Include="Avalonia" Version="11.3.2" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.2" />
+        <PackageReference Include="Avalonia.Labs.Qr" Version="11.3.1" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.2" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.2" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Include="Avalonia.Diagnostics" Version="11.3.2">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="hyjiacan.pinyin4net" Version="4.1.1" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0-preview.7.25380.108"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.4-beta1"/>
-        <PackageReference Include="ReactiveUI" Version="20.4.1"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0-preview.7.25380.108" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4-beta1" />
+        <PackageReference Include="ReactiveUI" Version="20.4.1" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
     </ItemGroup>
 
@@ -38,10 +39,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\bili-kernel\src\BiliKernel.Abstractions\BiliKernel.Abstractions.csproj"/>
-        <ProjectReference Include="..\bili-kernel\src\BiliKernel.Core\BiliKernel.Core.csproj"/>
-        <ProjectReference Include="..\bili-kernel\src\BiliKernel.Grpc\BiliKernel.Grpc.csproj"/>
-        <ProjectReference Include="..\bili-kernel\src\Services\Services.User\Services.User.csproj"/>
+        <ProjectReference Include="..\bili-kernel\src\BiliKernel.Abstractions\BiliKernel.Abstractions.csproj" />
+        <ProjectReference Include="..\bili-kernel\src\BiliKernel.Core\BiliKernel.Core.csproj" />
+        <ProjectReference Include="..\bili-kernel\src\BiliKernel.Grpc\BiliKernel.Grpc.csproj" />
+        <ProjectReference Include="..\bili-kernel\src\Services\Services.User\Services.User.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -52,10 +53,24 @@
         <None Include="Assets\Audios\Bgm.mp3">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+
+        <None Remove=".github\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include=".github\workflows\publish.yml" />
+      <AvaloniaXaml Remove=".github\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove=".github\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove=".github\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Remove=".github\**" />
     </ItemGroup>
 
 </Project>
