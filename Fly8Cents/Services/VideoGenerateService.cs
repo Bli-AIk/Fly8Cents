@@ -144,9 +144,10 @@ public static class VideoGenerateService
         var scaleX = width / 3840.0;
         var scaleY = height / 2160.0;
         var perspX0 = (int)(1050 * scaleX);
-        var perspY0 = (int)(570 * scaleY);
+        const int perspY = 570 / 4;
+        var perspY0 = (int)(perspY * scaleY);
         var perspX1 = (int)(2790 * scaleX);
-        var perspY1 = (int)(570 * scaleY);
+        var perspY1 = (int)(perspY * scaleY);
         var perspX2 = (int)(1800 * scaleX);
         
         var speed = (int)(100 * scaleY);

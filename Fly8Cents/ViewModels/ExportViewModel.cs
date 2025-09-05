@@ -51,7 +51,7 @@ public class ExportViewModel : ReactiveObject
 
                 var lines = VideoGenerateService.WrapString(text).Split([Environment.NewLine], StringSplitOptions.None)
                     .Length;
-                return $"格式化后行数：{lines}。预计导出时长为{lines * 2}秒。";
+                return $"格式化后行数：{lines}。预计导出时长为{lines * 2 + 16}秒。";
             })
             .ToProperty(this, x => x.EstimatedTimeText);
 
