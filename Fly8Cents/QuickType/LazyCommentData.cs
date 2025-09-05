@@ -111,6 +111,8 @@ namespace QuickType.LazyComment
 
         [JsonProperty("sign")]
         public string Sign { get; set; }
+        [JsonProperty("Sex")]
+        public string Sex { get; set; }
 
         [JsonProperty("vipType")]
         public long VipType { get; set; }

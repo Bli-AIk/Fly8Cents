@@ -13,9 +13,9 @@ namespace Fly8Cents.ViewModels;
 
 public class BasicInfoViewModel : ViewModelBase
 {
-    private DateTimeOffset _endDate = DateTimeOffset.Now;
+    private DateTimeOffset _endDate;
 
-    private DateTimeOffset _startDate = DateTimeOffset.Now.AddDays(-7);
+    private DateTimeOffset _startDate;
 
     private UploaderInfoModel _uploader = new()
     {
@@ -28,6 +28,9 @@ public class BasicInfoViewModel : ViewModelBase
 
     public BasicInfoViewModel(HttpClient httpClient)
     {
+        _endDate = DateTimeOffset.Now;
+        _startDate = DateTimeOffset.Now.AddDays(-7);
+        
         _uploaderAvatar = GetDefaultBitmap();
         ExtractUid = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -59,23 +62,24 @@ public class BasicInfoViewModel : ViewModelBase
         get => _uploader;
         set => this.RaiseAndSetIfChanged(ref _uploader, value);
     }
+    
     public DateTimeOffset StartDate
     {
-        get => new(_startDate.Year, _startDate.Month, _startDate.Day, 0, 0, 0, _startDate.Offset);
+        get => _startDate;
         set
         {
             this.RaiseAndSetIfChanged(ref _startDate, value);
-            MessageBus.Current.SendMessage(StartDate, "StartDate");
+            MessageBus.Current.SendMessage(_startDate, "StartDate");
         }
     }
 
     public DateTimeOffset EndDate
     {
-        get => new(_endDate.Year, _endDate.Month, _endDate.Day, 23, 59, 59, _endDate.Offset);
+        get => _endDate;
         set
         {
-            this.RaiseAndSetIfChanged(ref _endDate, value); 
-            MessageBus.Current.SendMessage(EndDate, "EndDate");
+            this.RaiseAndSetIfChanged(ref _endDate, value);
+            MessageBus.Current.SendMessage(_endDate, "EndDate");
         }
     }
 

@@ -37,10 +37,23 @@
         </StackPanel>
 
         <!-- 中间大文本框，可编辑 -->
-        <TextBox Grid.Row="1"
-                 AcceptsReturn="True"
-                 TextWrapping="Wrap"
-                 Text="{Binding CommentsText, Mode=TwoWay}" />
+        <TabControl Grid.Row="1">
+            <TabItem Header="文本">
+                <TextBox AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         Text="{Binding CommentsText, Mode=TwoWay}" />
+            </TabItem>
+            <TabItem Header="配置">
+                <Grid ColumnDefinitions="*,*">
+                    <TextBox AcceptsReturn="True"
+                             TextWrapping="NoWrap"
+                             Text="{Binding ConfigText, Mode=TwoWay}" />
+                    <TextBlock Grid.Column="1" Name="ConfigTips" Margin="5"/>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+
 
         <!-- 底部导出及视频参数 -->
         <StackPanel Grid.Row="2" Orientation="Vertical" Spacing="10">

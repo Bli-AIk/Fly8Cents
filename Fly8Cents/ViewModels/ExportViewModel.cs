@@ -394,6 +394,13 @@ public class ExportViewModel : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _commentsText, value);
     }
 
+    private string _configText = "{year}-{month}-{day} {hour}:{minute}\nid: {uname}\n{message}\n\n";
+    public string ConfigText
+    {
+        get => _configText;
+        set => this.RaiseAndSetIfChanged(ref _configText, value);
+    }
+
     public string EstimatedTimeText => _estimatedTimeText.Value;
 
     // 视频参数属性
@@ -541,10 +548,19 @@ public class ExportViewModel : ReactiveObject
                     continue;
                 }
 
-                message = EmoticonHelper.ProcessBilibiliEmoticon(message);
+                message = StringHelper.ProcessBilibiliEmoticon(message);
 
-                var dateText = dateTime.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
-                CommentsText += $"{dateText}\nid: {reply.Member.Uname}\n{message}\n\n";
+                var output =
+                    StringHelper.FormatComment(dateTime,
+                        reply.Member.Uname,
+                        reply.Member.Mid,
+                        reply.Member.Sign,
+                        reply.Member.Level,
+                        reply.Member.Sex,
+                        reply.Like,
+                        message, ConfigText);
+
+                CommentsText += output;
                 await Task.Delay(500);
             }
 
