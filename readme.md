@@ -16,6 +16,48 @@
 * ……还有不明所以的片头和片尾。
 * 支持自定义文本。
 
+## 快速开始
+
+本项目依赖 [FFmpeg](https://ffmpeg.org/) 进行视频导出，但 **不影响评论爬取功能**。
+如果你只需要爬取评论，可以跳过 FFmpeg 的安装。
+
+### 1. 安装 FFmpeg（可选，仅用于视频导出）
+
+* **Windows**
+
+    1. 前往 [FFmpeg 下载页](https://ffmpeg.org/download.html) 获取 Windows 版本。
+    2. 解压缩后，将 `bin` 目录路径加入到系统 **环境变量 `PATH`** 中。
+    3. 打开命令行，输入 `ffmpeg -version` 验证是否安装成功。
+
+* **Linux**
+
+    * **Arch Linux / Manjaro**
+
+      ```bash
+      sudo pacman -S ffmpeg
+      ffmpeg -version
+      ```
+    * **Debian / Ubuntu / 其他基于 Debian 的发行版**
+
+      ```bash
+      sudo apt update
+      sudo apt install ffmpeg
+      ffmpeg -version
+      ```
+
+* **macOS**
+  使用 [Homebrew](https://brew.sh/) 安装：
+
+  ```bash
+  brew install ffmpeg
+  ffmpeg -version
+  ```
+
+### 2. 下载本项目软件
+
+1. 根据你的操作系统，前往 [Releases](./releases) 页面下载对应的发行版。
+2. 解压后直接运行可执行文件即可。
+
 ## 依赖项 / 致谢
 本项目基于以下库而制作：
 - [AvaloniaUI](https://avaloniaui.net/)
