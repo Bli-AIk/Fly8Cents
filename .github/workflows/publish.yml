@@ -105,3 +105,4 @@ jobs:
             # Release Notes
             - Automatically published via GitHub Actions.
             - This release includes builds for Windows (x86), Linux (x64), and macOS (x64).
+            
