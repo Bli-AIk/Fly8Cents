@@ -33,6 +33,9 @@
 本项目中默认附带的音频文件：
 - [CD 1_Charlie Chaplin - Pay day [1922].](https://archive.org/details/charlie-chaplin-the-essential-film-music-collection-2006-opus-128)
 
+本项目中默认附带的字体文件：
+- [思源黑体](https://github.com/adobe-fonts/source-han-sans)
+
 衷心感谢你们！
 
 ## 待办
