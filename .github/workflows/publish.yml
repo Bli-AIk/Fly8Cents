@@ -91,7 +91,7 @@ jobs:
           tar -czvf ${{ env.PublishFilePath }}/${{ env.ProjectName }}_macos-x64.tar.gz -C ${{ env.PublishFilePath }} macos-x64
 
       - name: Upload artifacts to Release
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ProjectName }}-${{ matrix.os }}-build
           path: ${{ env.PublishFilePath }}/
