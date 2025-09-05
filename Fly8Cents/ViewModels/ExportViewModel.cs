@@ -37,7 +37,7 @@ public class ExportViewModel : ReactiveObject
     private TextSettingsModel _textSettings = new();
 
     private UploaderInfoModel _uploader = new();
-    private int _videoDuration = 60;
+    private double _videoDuration = 60;
 
     public ExportViewModel(HttpClient httpClient)
     {
@@ -366,7 +366,7 @@ public class ExportViewModel : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _selectedFrameRate, value);
     }
 
-    public int VideoDuration
+    public double VideoDuration
     {
         get => _videoDuration;
         set => this.RaiseAndSetIfChanged(ref _videoDuration, value);

@@ -65,7 +65,7 @@
                     <!-- 时长 -->
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="时长 (秒)" />
-                        <NumericUpDown Minimum="1" Maximum="3600"
+                        <NumericUpDown Minimum="1"
                                        Value="{Binding VideoDuration}" Width="150" />
                     </StackPanel>
 
