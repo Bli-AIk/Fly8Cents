@@ -54,13 +54,26 @@ jobs:
         run: |
           dotnet publish ./${{ env.ProjectName }}/${{ env.ProjectName }}.csproj -c ${{ env.Configuration }} -r osx-x64 --self-contained -o ${{ env.PublishFilePath }}/macos-x64
 
-      - name: Get tag version
+      - name: Get tag version (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
         id: tag
+        shell: pwsh
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            echo "::set-output name=tag::manual-$(Get-Date -Format 'yyyyMMddHHmm')"
+          } else {
+            echo "::set-output name=tag::$(git describe --tags --always)"
+          }
+
+      - name: Get tag version (Linux/macOS)
+        if: ${{ matrix.os != 'windows-latest' }}
+        id: tag
+        shell: bash
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-          echo "::set-output name=tag::manual-$(date +%Y%m%d%H%M)"
+            echo "::set-output name=tag::manual-$(date +%Y%m%d%H%M)"
           else
-          echo "::set-output name=tag::$(git describe --tags --always)"
+            echo "::set-output name=tag::$(git describe --tags --always)"
           fi
 
       - name: Create Windows x86 archive
