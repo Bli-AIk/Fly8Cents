@@ -1,0 +1,90 @@
+name: Publish Avalonia App
+
+env:
+  ProjectName: MyAvaloniaApp
+  Configuration: Release
+  PublishFilePath: Publish
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch: 
+
+jobs:
+  Publish:
+    name: Publish on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install AvaloniaUI prerequisites (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libxext-dev libxcursor-dev libxfixes-dev libxi-dev libgdk-pixbuf2.0-dev libglib2.0-dev
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build and Publish Windows x86
+        if: matrix.os == 'windows-latest'
+        run: |
+          dotnet publish ./src/${{ env.ProjectName }}.csproj -c ${{ env.Configuration }} -r win-x86 --self-contained -o ${{ env.PublishFilePath }}/win-x86
+
+      - name: Build and Publish Linux x64
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          dotnet publish ./src/${{ env.ProjectName }}.csproj -c ${{ env.Configuration }} -r linux-x64 --self-contained -o ${{ env.PublishFilePath }}/linux-x64
+
+      - name: Build and Publish macOS x64
+        if: matrix.os == 'macos-latest'
+        run: |
+          dotnet publish ./src/${{ env.ProjectName }}.csproj -c ${{ env.Configuration }} -r osx-x64 --self-contained -o ${{ env.PublishFilePath }}/macos-x64
+
+      - name: Get tag version
+        id: tag
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            echo "::set-output name=tag::manual-$(date +%Y%m%d%H%M)"
+          } else {
+            echo "::set-output name=tag::$(git describe --tags --always)"
+          }
+
+      - name: Create archives
+        shell: pwsh
+        run: |
+          if ("${{ matrix.os }}" -eq "windows-latest") {
+            Compress-Archive -Path ${{ env.PublishFilePath }}\win-x86 -DestinationPath ${{ env.PublishFilePath }}\${{ env.ProjectName }}_win-x86.zip
+          }
+          if ("${{ matrix.os }}" -eq "ubuntu-latest") {
+            tar -czvf ${{ env.PublishFilePath }}/${{ env.ProjectName }}_linux-x64.tar.gz -C ${{ env.PublishFilePath }} linux-x64
+          }
+          if ("${{ matrix.os }}" -eq "macos-latest") {
+            tar -czvf ${{ env.PublishFilePath }}/${{ env.ProjectName }}_macos-x64.tar.gz -C ${{ env.PublishFilePath }} macos-x64
+
+      - name: Create Release
+        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "${{ env.PublishFilePath }}/*"
+          tag: ${{ steps.tag.outputs.tag }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Release ${{ steps.tag.outputs.tag }}
+          prerelease: false
+          body: |
+            # Release Notes
+            - Automatically published via GitHub Actions.
+            - This release includes builds for Windows (x86), Linux (x64), and macOS (x64).
