@@ -42,17 +42,17 @@ jobs:
       - name: Build and Publish Windows x86
         if: matrix.os == 'windows-latest'
         run: |
-          dotnet publish ./src/${{ env.ProjectName }}.csproj -c ${{ env.Configuration }} -r win-x86 --self-contained -o ${{ env.PublishFilePath }}/win-x86
+          dotnet publish ./${{ env.ProjectName }}/${{ env.ProjectName }}.csproj -c ${{ env.Configuration }} -r win-x86 --self-contained -o ${{ env.PublishFilePath }}/win-x86
 
       - name: Build and Publish Linux x64
         if: matrix.os == 'ubuntu-latest'
         run: |
-          dotnet publish ./src/${{ env.ProjectName }}.csproj -c ${{ env.Configuration }} -r linux-x64 --self-contained -o ${{ env.PublishFilePath }}/linux-x64
+          dotnet publish ./${{ env.ProjectName }}/${{ env.ProjectName }}.csproj -c ${{ env.Configuration }} -r linux-x64 --self-contained -o ${{ env.PublishFilePath }}/linux-x64
 
       - name: Build and Publish macOS x64
         if: matrix.os == 'macos-latest'
         run: |
-          dotnet publish ./src/${{ env.ProjectName }}.csproj -c ${{ env.Configuration }} -r osx-x64 --self-contained -o ${{ env.PublishFilePath }}/macos-x64
+          dotnet publish ./${{ env.ProjectName }}/${{ env.ProjectName }}.csproj -c ${{ env.Configuration }} -r osx-x64 --self-contained -o ${{ env.PublishFilePath }}/macos-x64
 
       - name: Get tag version
         id: tag
