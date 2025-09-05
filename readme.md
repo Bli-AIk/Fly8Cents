@@ -7,7 +7,7 @@
 
 ## 示例
 【完整名单】1-9月评论区羞辱过沈阳美食家的人，以及回应    --哔哩哔哩
-[![【完整名单】1-9月评论区羞辱过沈阳美食家的人，以及回应](https://i0.hdslb.com/bfs/archive/6c2bafd235cb2bbaaec959b3537c94894a63297b.jpg)](https://www.bilibili.com/video/BV1wRa4zVEWW)
+[![【完整名单】1-9月评论区羞辱过沈阳美食家的人，以及回应](https://i0.hdslb.com/bfs/archive/f1cce609b210eb7a8cb4080859aa49f5e75a6a66.jpg)](https://www.bilibili.com/video/BV1M6a4zXEcM)
 
 ## 功能
 
