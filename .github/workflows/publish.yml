@@ -63,17 +63,23 @@ jobs:
           echo "::set-output name=tag::$(git describe --tags --always)"
           fi
 
-      - name: Create archives
+      - name: Create Windows x86 archive
+        if: ${{ matrix.os == 'windows-latest' }}
         shell: pwsh
         run: |
-          if ("${{ matrix.os }}" -eq "windows-latest") {
-            Compress-Archive -Path ${{ env.PublishFilePath }}\win-x86 -DestinationPath ${{ env.PublishFilePath }}\${{ env.ProjectName }}_win-x86.zip
-          }
-          if ("${{ matrix.os }}" -eq "ubuntu-latest") {
-            tar -czvf ${{ env.PublishFilePath }}/${{ env.ProjectName }}_linux-x64.tar.gz -C ${{ env.PublishFilePath }} linux-x64
-          }
-          if ("${{ matrix.os }}" -eq "macos-latest") {
-            tar -czvf ${{ env.PublishFilePath }}/${{ env.ProjectName }}_macos-x64.tar.gz -C ${{ env.PublishFilePath }} macos-x64
+          Compress-Archive -Path ${{ env.PublishFilePath }}\win-x86 -DestinationPath ${{ env.PublishFilePath }}\${{ env.ProjectName }}_win-x86.zip
+
+      - name: Create Linux x64 archive
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        shell: bash
+        run: |
+          tar -czvf ${{ env.PublishFilePath }}/${{ env.ProjectName }}_linux-x64.tar.gz -C ${{ env.PublishFilePath }} linux-x64
+
+      - name: Create macOS x64 archive
+        if: ${{ matrix.os == 'macos-latest' }}
+        shell: bash
+        run: |
+          tar -czvf ${{ env.PublishFilePath }}/${{ env.ProjectName }}_macos-x64.tar.gz -C ${{ env.PublishFilePath }} macos-x64
 
       - name: Create Release
         if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
