@@ -56,7 +56,6 @@ jobs:
 
       - name: Get tag version (Windows)
         if: ${{ matrix.os == 'windows-latest' }}
-        id: tag
         shell: pwsh
         run: |
           if ("${{ github.event_name }}" -eq "workflow_dispatch") {
@@ -67,7 +66,6 @@ jobs:
 
       - name: Get tag version (Linux/macOS)
         if: ${{ matrix.os != 'windows-latest' }}
-        id: tag
         shell: bash
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
