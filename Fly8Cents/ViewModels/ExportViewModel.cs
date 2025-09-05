@@ -24,10 +24,10 @@ public class ExportViewModel : ReactiveObject
 
     private DateTimeOffset _endDate = DateTimeOffset.Now;
     private bool _isExcludeOutOfRangeComments;
+    private bool _isExportEnd = true;
+    private bool _isExportFeature = true;
 
     private bool _isExportStart = true;
-    private bool _isExportFeature = true;
-    private bool _isExportEnd = true;
     private bool _isFetchSpaces = true;
     private bool _isFetchVideos = true;
     private int _selectedFrameRate;
@@ -163,7 +163,7 @@ public class ExportViewModel : ReactiveObject
         {
             try
             {
-                if (string.IsNullOrEmpty(CommentsText))
+                if (string.IsNullOrEmpty(CommentsText) && IsExportFeature)
                 {
                     ConsoleWriteLine("请在导出前输入文本。");
                     return;
@@ -177,32 +177,36 @@ public class ExportViewModel : ReactiveObject
 
                 const string ffmpegPath = "ffmpeg";
 
-                var lineCount = -1;
-                using (var reader = new StringReader(formattedText))
+                if (IsExportFeature)
                 {
-                    while (reader.ReadLine() is { } formattedTextLine)
+                    var lineCount = -1;
+                    using (var reader = new StringReader(formattedText))
                     {
-                        lineCount++;
-
-                        if (string.IsNullOrWhiteSpace(formattedTextLine))
+                        while (reader.ReadLine() is { } formattedTextLine)
                         {
-                            continue;
+                            lineCount++;
+
+                            if (string.IsNullOrWhiteSpace(formattedTextLine))
+                            {
+                                continue;
+                            }
+
+                            var textPngArguments =
+                                VideoGenerateService.GetTextPngArguments(SelectedResolution, formattedTextLine,
+                                    lineCount);
+                            await VideoGenerateService.RunFfmpegAsync(ffmpegPath, textPngArguments);
+
+                            ConsoleWriteLine($"第{lineCount}张文本图片导出完毕。");
                         }
-
-                        var textPngArguments =
-                            VideoGenerateService.GetTextPngArguments(SelectedResolution, formattedTextLine, lineCount);
-                        await VideoGenerateService.RunFfmpegAsync(ffmpegPath, textPngArguments);
-
-                        ConsoleWriteLine($"第{lineCount}张文本图片导出完毕。");
                     }
+
+                    ConsoleWriteLine("所有文本图片导出完毕。\n准备拼接……");
+
+                    ImageStitcher.StitchImages(lineCount);
+                    ConsoleWriteLine("拼接完毕。\n正在清理冗余图片…");
+                    ImageStitcher.DeleteImages(lineCount);
+                    ConsoleWriteLine("清理完毕。");
                 }
-
-                ConsoleWriteLine("所有文本图片导出完毕。\n准备拼接……");
-
-                ImageStitcher.StitchImages(lineCount);
-                ConsoleWriteLine("拼接完毕。\n正在清理冗余图片…");
-                ImageStitcher.DeleteImages(lineCount);
-                ConsoleWriteLine("清理完毕。");
 
                 if (IsExportStart)
                 {
@@ -244,7 +248,7 @@ public class ExportViewModel : ReactiveObject
                 {
                     ConsoleWriteLine("跳过视频2（正片）导出。");
                 }
-                
+
                 ConsoleWriteLine("所有视频导出完毕。\n正在合并……");
 
 
