@@ -55,7 +55,7 @@
 
 ### 2. 下载本项目软件
 
-1. 根据你的操作系统，前往 [Releases](./releases) 页面下载对应的发行版。
+1. 根据你的操作系统，前往 [Releases](https://github.com/Bli-AIk/Fly8Cents/releases) 页面下载对应的发行版。
 2. 解压后直接运行可执行文件即可。
 
 ## 依赖项 / 致谢
