@@ -6,7 +6,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Fly8Cents.Views.ConfigView"
              x:DataType="vm:ConfigViewModel">
-    <Grid Margin="10" RowDefinitions="Auto,*" ColumnDefinitions="*,*">
+    <Grid Margin="10" RowDefinitions="Auto,Auto" ColumnDefinitions="*,*">
         <!-- 黑名单 -->
         <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Margin="5" Padding="5">
             <Grid RowDefinitions="Auto,Auto,Auto">
@@ -57,5 +57,27 @@
                 </StackPanel>
             </Grid>
         </Border>
+        
+        <!-- AI 检索 -->
+        <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="5" RowDefinitions="Auto,Auto,Auto,Auto" MinHeight="160">
+            <CheckBox Content="对剩余评论进行 AI 检索 (WIP 暂未实现)"
+                      Grid.Row="0"
+                      IsChecked="{Binding IsUseAi, Mode=TwoWay}" />
+            <TextBox Grid.Row="1"
+                     IsEnabled="{Binding IsUseAi}"
+                     Watermark="AI 接口地址（Open API兼容）"
+                     Margin="0,5,0,0"
+                     Text="{Binding AiEndpoint, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+            <TextBox Grid.Row="2"
+                     IsEnabled="{Binding IsUseAi}"
+                     Watermark="AI 接口 Key"
+                     Margin="0,5,0,0"
+                     Text="{Binding AiApiKey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+            <TextBox Grid.Row="3"
+                     IsEnabled="{Binding IsUseAi}"
+                     Watermark="AI pompt（现在没用，prompt写死了）"
+                     Margin="0,5,0,0"
+                     Text="{Binding AiPrompt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+        </Grid>
     </Grid>
 </UserControl>

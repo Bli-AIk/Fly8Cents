@@ -543,8 +543,26 @@ public class ExportViewModel : ReactiveObject
                      HomophoneChecker.HasHomophone(message,
                          whitelistedWord)));
 
-                if ((Config.BlackList.Count > 0 && hasBlacklistedWord) ||
-                    (Config.WhiteList.Count > 0 && !hasWhitelistedWord))
+                // 命中黑名单或未命中白名单即为正常的评论
+                var isXiuru = !(
+                    (Config.BlackList.Count > 0 && hasBlacklistedWord)
+                    || (Config.WhiteList.Count > 0 && !hasWhitelistedWord)
+                );
+                // 如果关键词检测没有命中，则在开启AI检测的情况下使用AI检测
+                // 用Contains是因为AI可能会返回一些额外的内容
+                if (Config.IsUseAi)
+                {
+                    var aiText = AiService.CheckCommentAsync(message, Config.AiEndpoint, Config.AiApiKey);
+                    if (aiText.Contains("true"))
+                    {
+                        isXiuru = true;
+                    }
+                    else if (aiText.Contains("false"))
+                    {
+                        isXiuru = false;
+                    }
+                }
+                if (!isXiuru)
                 {
                     continue;
                 }

@@ -12,6 +12,7 @@ public class ConfigViewModel : ViewModelBase
     private string _newWhiteItem = "";
     private string? _selectedBlackItem;
     private string? _selectedWhiteItem;
+    private bool _isUseAi;
 
     public ConfigViewModel()
     {
@@ -102,6 +103,49 @@ public class ConfigViewModel : ViewModelBase
     {
         get => _selectedBlackItem;
         set => this.RaiseAndSetIfChanged(ref _selectedBlackItem, value);
+    }
+
+    public bool IsUseAi
+    {
+        get => _isUseAi;
+        set
+        {
+            if (Config.IsUseAi == value) return;
+            Config.IsUseAi = value;
+            this.RaiseAndSetIfChanged(ref _isUseAi, value);
+            MessageBus.Current.SendMessage(Config);
+        }
+}
+
+    public string AiEndpoint
+    {
+        get => Config.AiEndpoint;
+        set
+        {
+            if (Config.AiEndpoint == value) return;
+            Config.AiEndpoint = value;
+            MessageBus.Current.SendMessage(Config);
+        }
+    }
+    public string AiApiKey
+    {
+        get => Config.AiApiKey;
+        set
+        {
+            if (Config.AiApiKey == value) return;
+            Config.AiApiKey = value;
+            MessageBus.Current.SendMessage(Config);
+        }
+    }
+    public string AiPrompt
+    {
+        get => Config.AiPrompt;
+        set
+        {
+            if (Config.AiPrompt == value) return;
+            Config.AiPrompt = value;
+            MessageBus.Current.SendMessage(Config);
+        }
     }
 
     public ReactiveCommand<Unit, Unit> AddBlackCommand { get; }
