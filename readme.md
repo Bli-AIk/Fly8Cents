@@ -15,6 +15,7 @@
 * 生成带有音乐的星战片头风格视频……（音乐可自行替换）
 * ……还有不明所以的片头和片尾。
 * 支持自定义文本。
+* 支持通过开放接口（Open API，包括 DeepSeek、OpenAI 等）调用 AI 进行筛选。
 
 ## 快速开始
 
@@ -80,11 +81,16 @@
 
 衷心感谢你们！
 
-## 待办
-* 支持 AI 集成筛选
-
 ## 贡献
-欢迎提交 issue 或 PR，让生成器更好用。
+以下人员为本项目做出了贡献。
+
+<a href = "https://github.com/Bli-AIk/Fly8Cents/Python/graphs/contributors">
+<img src = "https://contrib.rocks/image?repo=Bli-AIk/Fly8Cents"/>
+</a>
+
+**衷心感谢你们每一个人！🎔**
+
+如果你发现Bug、想要修复问题或者改进此项目，欢迎提交 issue 或 PR，让生成器更好用。
 
 ## 许可证
 GPL-3.0 license
