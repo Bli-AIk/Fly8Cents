@@ -74,6 +74,11 @@ public class ExportViewModel : ReactiveObject
         {
             try
             {
+                if (Uploader.Uid <= 0)
+                {
+                    ConsoleWriteLine($"UP主uid: {Uploader.Uid} 不合法。\n请先在 基本信息 页提取UP主uid，在UP主头像与用户名正确显示后重试。");
+                    return;
+                }                
                 CommentsText = "";
 
                 ConsoleOutput = $"准备爬取信息。\n目标UP主: {Uploader.Nickname} (Uid:{Uploader.Uid})\n\n";
@@ -543,8 +548,37 @@ public class ExportViewModel : ReactiveObject
                      HomophoneChecker.HasHomophone(message,
                          whitelistedWord)));
 
-                if ((Config.BlackList.Count > 0 && hasBlacklistedWord) ||
-                    (Config.WhiteList.Count > 0 && !hasWhitelistedWord))
+                // 命中黑名单或未命中白名单即为正常的评论
+                var isXiuRu = !(
+                    (Config.BlackList.Count > 0 && hasBlacklistedWord)
+                    || (Config.WhiteList.Count > 0 && !hasWhitelistedWord)
+                );
+                // 如果关键词检测没有命中，则在开启AI检测的情况下使用AI检测
+                // 用Contains是因为AI可能会返回一些额外的内容
+                var isNotListedWord = !hasBlacklistedWord && !hasWhitelistedWord;
+                var shouldCheckWithAi = isNotListedWord || (!isNotListedWord && !isXiuRu);
+                if (Config.IsUseAi && shouldCheckWithAi)
+                {
+                    ConsoleWriteLine($"正在使用AI检测评论：{message}");
+                    var aiText = await AiService.CheckCommentAsync(
+                        Config.AiPrompt,
+                        message,
+                        Config.AiEndpoint,
+                        Config.AiApiKey,
+                        Config.AiModel);
+                    if (aiText.Contains("true"))
+                    {
+                        isXiuRu = true;
+                        ConsoleWriteLine("该评论通过检测。");
+                    }
+                    else
+                    {
+                        isXiuRu = false;
+                        ConsoleWriteLine("该评论未通过检测。");
+                    }
+                }
+                
+                if (!isXiuRu)
                 {
                     continue;
                 }

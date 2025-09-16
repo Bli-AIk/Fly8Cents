@@ -6,22 +6,15 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Fly8Cents.Views.TextSettingsView"
              x:DataType="vm:TextSettingsViewModel">
-    <Grid Margin="10" RowDefinitions="25,*,*" ColumnDefinitions="*,*">
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="开头文本" FontSize="16" HorizontalAlignment="Center" />
-        <TextBox Grid.Row="1" Grid.Column="0" AcceptsReturn="True" Margin="5"
+    <Grid Margin="10" RowDefinitions="Auto,*,Auto,*">
+        <!-- 开头文本 -->
+        <TextBlock Grid.Row="0" Text="开头文本" FontSize="16" HorizontalAlignment="Center" Margin="0,5"/>
+        <TextBox Grid.Row="1" AcceptsReturn="True" Margin="5"
                  Text="{Binding TextSettings.StartText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-        <TextBlock Grid.Row="0" Grid.Column="1" Text="结尾文本" FontSize="16" HorizontalAlignment="Center" />
-        <TextBox Grid.Row="1" Grid.Column="1" AcceptsReturn="True" Margin="5"
+
+        <!-- 结尾文本 -->
+        <TextBlock Grid.Row="2" Text="结尾文本" FontSize="16" HorizontalAlignment="Center" Margin="0,10,0,5"/>
+        <TextBox Grid.Row="3" AcceptsReturn="True" Margin="5"
                  Text="{Binding TextSettings.EndText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-
-        <!-- AI 检索 -->
-        <Grid Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0" Margin="5" RowDefinitions="Auto,*">
-
-            <CheckBox Content="对剩余评论进行 AI 检索 (WIP 暂未实现)" Grid.Row="0"
-                      IsChecked="{Binding TextSettings.IsUseAi, Mode=TwoWay}" />
-            <TextBox Grid.Row="1" AcceptsReturn="True"
-                     IsEnabled="{Binding TextSettings.IsUseAi}"
-                     Text="{Binding TextSettings.AiPrompt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-        </Grid>
     </Grid>
 </UserControl>
