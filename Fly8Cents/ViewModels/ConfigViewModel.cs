@@ -7,6 +7,7 @@ namespace Fly8Cents.ViewModels;
 public class ConfigViewModel : ViewModelBase
 {
     private ConfigModel _config = new();
+    private bool _isUseAi;
 
     private string _newBlackItem = "";
     private string _newWhiteItem = "";
@@ -102,6 +103,82 @@ public class ConfigViewModel : ViewModelBase
     {
         get => _selectedBlackItem;
         set => this.RaiseAndSetIfChanged(ref _selectedBlackItem, value);
+    }
+
+    public bool IsUseAi
+    {
+        get => _isUseAi;
+        set
+        {
+            if (Config.IsUseAi == value)
+            {
+                return;
+            }
+
+            Config.IsUseAi = value;
+            this.RaiseAndSetIfChanged(ref _isUseAi, value);
+            MessageBus.Current.SendMessage(Config);
+        }
+    }
+
+    public string AiEndpoint
+    {
+        get => Config.AiEndpoint;
+        set
+        {
+            if (Config.AiEndpoint == value)
+            {
+                return;
+            }
+
+            Config.AiEndpoint = value;
+            MessageBus.Current.SendMessage(Config);
+        }
+    }
+
+    public string AiApiKey
+    {
+        get => Config.AiApiKey;
+        set
+        {
+            if (Config.AiApiKey == value)
+            {
+                return;
+            }
+
+            Config.AiApiKey = value;
+            MessageBus.Current.SendMessage(Config);
+        }
+    }
+
+    public string AiModel
+    {
+        get => Config.AiModel;
+        set
+        {
+            if (Config.AiModel == value)
+            {
+                return;
+            }
+
+            Config.AiModel = value;
+            MessageBus.Current.SendMessage(Config);
+        }
+    }
+
+    public string AiPrompt
+    {
+        get => Config.AiPrompt;
+        set
+        {
+            if (Config.AiPrompt == value)
+            {
+                return;
+            }
+
+            Config.AiPrompt = value;
+            MessageBus.Current.SendMessage(Config);
+        }
     }
 
     public ReactiveCommand<Unit, Unit> AddBlackCommand { get; }

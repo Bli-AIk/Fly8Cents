@@ -7,13 +7,11 @@
              x:Class="Fly8Cents.Views.ConfigView"
              x:DataType="vm:ConfigViewModel">
     <Grid Margin="10" RowDefinitions="Auto,*" ColumnDefinitions="*,*">
-        <!-- 黑名单 -->
         <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Margin="5" Padding="5">
             <Grid RowDefinitions="Auto,Auto,Auto">
                 <TextBlock Text="黑名单关键词" FontWeight="Bold" Margin="0,0,0,5" Grid.Row="0"
                            HorizontalAlignment="Center" />
 
-                <!-- 固定高度的 ListBox -->
                 <ListBox ItemsSource="{Binding Config.BlackList}"
                          SelectedItem="{Binding SelectedBlackItem}"
                          Grid.Row="1" Height="150" />
@@ -32,14 +30,12 @@
             </Grid>
         </Border>
 
-        <!-- 白名单 -->
         <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Margin="5" Padding="5"
                 Grid.Row="0" Grid.Column="1">
             <Grid RowDefinitions="Auto,Auto,Auto">
                 <TextBlock Text="白名单关键词" FontWeight="Bold" Margin="0,0,0,5" Grid.Row="0"
                            HorizontalAlignment="Center" />
 
-                <!-- 固定高度的 ListBox -->
                 <ListBox ItemsSource="{Binding Config.WhiteList}"
                          SelectedItem="{Binding SelectedWhiteItem}"
                          Grid.Row="1" Height="150" />
@@ -57,5 +53,34 @@
                 </StackPanel>
             </Grid>
         </Border>
+        
+        <Grid Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0" Margin="5"
+              RowDefinitions="Auto,Auto,Auto,Auto,*">
+            <CheckBox Content="对剩余评论进行 AI 检索"
+                      Grid.Row="0"
+                      IsChecked="{Binding IsUseAi, Mode=TwoWay}" />
+            <TextBox Grid.Row="1"
+                     IsEnabled="{Binding IsUseAi}"
+                     Watermark="AI 接口地址（Open API兼容）"
+                     Margin="0,5"
+                     Text="{Binding AiEndpoint, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+            <TextBox Grid.Row="2"
+                     IsEnabled="{Binding IsUseAi}"
+                     Watermark="AI 接口 Key"
+                     Margin="0,5"
+                     Text="{Binding AiApiKey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+            <TextBox Grid.Row="3"
+                     IsEnabled="{Binding IsUseAi}"
+                     Watermark="AI 模型名称"
+                     Margin="0,5"
+                     Text="{Binding AiModel, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+            <TextBox Grid.Row="4"
+                     IsEnabled="{Binding IsUseAi}"
+                     Watermark="AI Prompt"
+                     Margin="0,5"
+                     Text="{Binding AiPrompt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"/>
+        </Grid>
     </Grid>
 </UserControl>
