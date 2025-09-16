@@ -55,8 +55,8 @@
         </Border>
         
         <Grid Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0" Margin="5"
-              RowDefinitions="Auto,Auto,Auto,*">
-            <CheckBox Content="对剩余评论进行 AI 检索 (WIP 暂未实现)"
+              RowDefinitions="Auto,Auto,Auto,Auto,*">
+            <CheckBox Content="对剩余评论进行 AI 检索"
                       Grid.Row="0"
                       IsChecked="{Binding IsUseAi, Mode=TwoWay}" />
             <TextBox Grid.Row="1"
@@ -69,8 +69,12 @@
                      Watermark="AI 接口 Key"
                      Margin="0,5"
                      Text="{Binding AiApiKey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-            
             <TextBox Grid.Row="3"
+                     IsEnabled="{Binding IsUseAi}"
+                     Watermark="AI 模型名称"
+                     Margin="0,5"
+                     Text="{Binding AiModel, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+            <TextBox Grid.Row="4"
                      IsEnabled="{Binding IsUseAi}"
                      Watermark="AI Prompt"
                      Margin="0,5"
