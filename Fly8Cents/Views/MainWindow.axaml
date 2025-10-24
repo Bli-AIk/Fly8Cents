@@ -35,6 +35,10 @@
         <TabItem Header="导出">
             <views:ExportView DataContext="{Binding Export}" />
         </TabItem>
+        
+        <TabItem Header="动态爬取">
+            <views:SpaceView DataContext="{Binding Space}" />
+        </TabItem>
     </TabControl>
 
 </Window>

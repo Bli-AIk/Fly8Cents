@@ -14,6 +14,7 @@ public class MainWindowViewModel : ViewModelBase
         QrLogin = new QrLoginViewModel(HttpClient);
         BasicInfo = new BasicInfoViewModel(HttpClient);
         Export = new ExportViewModel(HttpClient);
+        Space = new SpaceViewModel(HttpClient);
     }
 
     public ConfigViewModel Config { get; } = new();
@@ -23,6 +24,7 @@ public class MainWindowViewModel : ViewModelBase
     private HttpClient HttpClient { get; }
     public QrLoginViewModel QrLogin { get; }
     public BasicInfoViewModel BasicInfo { get; }
+    public SpaceViewModel Space { get; }
 
     public int SelectedIndex
     {

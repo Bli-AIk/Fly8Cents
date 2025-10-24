@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Fly8Cents.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Fly8Cents.Views.SpaceView"
+             x:DataType="vm:SpaceViewModel">
+
+    <Grid Margin="20" RowDefinitions="Auto,*">
+        <!-- 输入区域 -->
+        <Border Grid.Row="0"
+                Padding="20">
+            <StackPanel Spacing="15">
+                <TextBlock Text="空间动态提取工具" />
+
+                <TextBox Text="{Binding InputText, Mode=TwoWay}"
+                         Watermark="请在此输入用户Uid..."
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         VerticalContentAlignment="Top"
+                         Padding="10" />
+
+                <Button Content="提取空间动态"
+                        Command="{Binding ExtractSpaceCommand}"
+                        HorizontalAlignment="Right"
+                        Padding="20,8" />
+            </StackPanel>
+        </Border>
+        
+
+        <ScrollViewer Grid.Row="1" Height="100" VerticalScrollBarVisibility="Auto">
+            <TextBlock Text="{Binding ConsoleOutput}"
+                       FontFamily="Consolas"
+                       TextWrapping="Wrap" />
+        </ScrollViewer>
+    </Grid>
+</UserControl>
