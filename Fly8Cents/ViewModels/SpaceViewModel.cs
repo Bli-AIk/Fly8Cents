@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reactive;
@@ -120,7 +121,16 @@ public class SpaceViewModel : ViewModelBase
 
         var dynamicDetail = await BiliService.GetDynamicDetail(httpClient, id);
         
+        var name = $"{id}.txt";
+        if (File.Exists(name))
+        {
+            ConsoleOutput += $"文件 {name} 已存在，跳过处理。\n";
+            return;
+        }
+        
         await Task.Delay(1000);
+        
+        FinalText = "";
         
         if (dynamicDetail.Code != 0)
         {
@@ -192,6 +202,10 @@ public class SpaceViewModel : ViewModelBase
             await Task.Delay(5000);
             ConsoleOutput += $"正在爬取页{lazyComment.Data.Cursor.Next}……\n";
         }
+        
+        var fileName = $"{id}.txt";
+        await File.WriteAllTextAsync(fileName, FinalText);
+        ConsoleOutput += $"已保存内容到文件: {fileName}\n";
     }
 
     public string ConsoleOutput
