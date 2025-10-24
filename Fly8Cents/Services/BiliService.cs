@@ -260,20 +260,20 @@ public static class BiliService
     ///     获取特定动态卡片信息
     /// </summary>
     /// <param name="httpClient">HttpClient 实例</param>
-    /// <param name="oid">动态 ID</param>
+    /// <param name="id">动态 ID</param>
     /// <returns>DynamicDetailData</returns>
     /// <remarks>
     ///     参考：
     ///     <see href="https://socialsisteryi.github.io/bilibili-API-collect/docs/dynamic/get_dynamic_detail.html" />
     /// </remarks>
     public static async Task<DynamicDetailData> GetDynamicDetail(HttpClient httpClient,
-        long oid)
+        long id)
     {
         const string baseUrl = "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail";
 
         var query = new Dictionary<string, string>
         {
-            { "dynamic_id", oid.ToString() }
+            { "dynamic_id", id.ToString() }
         };
 
         var queryString = string.Join("&", query.Select(kvp =>

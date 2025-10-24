@@ -65,6 +65,9 @@ namespace QuickType.UserSpaceData
 
         [JsonProperty("visible")]
         public bool Visible { get; set; }
+        
+        [JsonProperty("id_str")]
+        public String IdStr { get; set; }
     }
 
     public partial class Basic

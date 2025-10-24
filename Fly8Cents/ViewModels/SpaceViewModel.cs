@@ -83,7 +83,12 @@ public class SpaceViewModel : ViewModelBase
                     continue;
                 }
 
-                if (!long.TryParse(item.Basic.CommentIdStr, out var id))
+                if (!long.TryParse(item.IdStr, out var id))
+                {
+                    continue;
+                }
+
+                if (!long.TryParse(item.Basic.CommentIdStr, out var oid))
                 {
                     continue;
                 }
@@ -91,7 +96,7 @@ public class SpaceViewModel : ViewModelBase
                 var itemTimeText = itemTime.ToString("yyyy年MM月dd日 HH:mm:ss", CultureInfo.GetCultureInfo("zh-CN"));
 
                 await OutputComment(httpClient,
-                    basicCommentType, id,
+                    basicCommentType, id, oid,
                     $"正在处理动态：{id}；发布时间：{itemTimeText}\n",
                     $"{id} 爬取成功。\n",
                     $"{id} 爬取失败。\n");
@@ -105,12 +110,29 @@ public class SpaceViewModel : ViewModelBase
 
     private async Task OutputComment(HttpClient httpClient,
         BiliService.CommentAreaType commentAreaType,
+        long id,
         long oid,
         string startConsole,
         string successConsole,
         string errorConsole)
     {
         ConsoleOutput += startConsole;
+
+        var dynamicDetail = await BiliService.GetDynamicDetail(httpClient, id);
+        
+        await Task.Delay(1000);
+        
+        if (dynamicDetail.Code != 0)
+        {
+            return;
+        }
+
+        FinalText += $"动态id: {id} \n\n";
+        FinalText += $"动态oid: {oid} \n\n";
+
+        FinalText += dynamicDetail.Data.Card.Card;
+
+        FinalText += "\n\n";
 
         var isBreak = false;
         var nextOffset = "";

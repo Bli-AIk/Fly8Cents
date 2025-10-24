@@ -7,7 +7,7 @@
              x:Class="Fly8Cents.Views.SpaceView"
              x:DataType="vm:SpaceViewModel">
 
-    <Grid Margin="20" RowDefinitions="Auto,*">
+    <Grid Margin="20" RowDefinitions="Auto,*,*">
         <!-- 输入区域 -->
         <Border Grid.Row="0"
                 Padding="20">
@@ -27,12 +27,18 @@
                         Padding="20,8" />
             </StackPanel>
         </Border>
-        
 
-        <ScrollViewer Grid.Row="1" Height="100" VerticalScrollBarVisibility="Auto">
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <TextBlock Text="{Binding ConsoleOutput}"
                        FontFamily="Consolas"
                        TextWrapping="Wrap" />
+        </ScrollViewer>
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <TextBox Text="{Binding FinalText}"
+                     FontFamily="Consolas"
+                     TextWrapping="Wrap" />
         </ScrollViewer>
     </Grid>
 </UserControl>
