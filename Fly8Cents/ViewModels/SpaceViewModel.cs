@@ -47,10 +47,22 @@ public class SpaceViewModel : ViewModelBase
     private string _finalText = "";
 
 
+    public string Offset
+    {
+        get => _offset;
+        set => this.RaiseAndSetIfChanged(ref _offset, value);
+    }
+
+    private string _offset = "";
     private async Task FetchSpacesComments(HttpClient httpClient, long uid)
     {
         ConsoleOutput += "爬取主页动态信息中……\n";
         long? offset = null;
+        if (!string.IsNullOrWhiteSpace(Offset))
+        {
+            offset = long.Parse(Offset);
+        }
+
         var isBreak = false;
 
         while (!isBreak)
@@ -101,6 +113,7 @@ public class SpaceViewModel : ViewModelBase
                     $"正在处理动态：{id}；发布时间：{itemTimeText}\n",
                     $"{id} 爬取成功。\n",
                     $"{id} 爬取失败。\n");
+                
             }
 
             await Task.Delay(5000);
@@ -119,9 +132,6 @@ public class SpaceViewModel : ViewModelBase
     {
         ConsoleOutput += startConsole;
 
-        var dynamicDetail = await BiliService.GetDynamicDetail(httpClient, id);
-        await Task.Delay(2500);
-        
         var name = $"{id}.txt";
         if (File.Exists(name))
         {
@@ -129,6 +139,13 @@ public class SpaceViewModel : ViewModelBase
             return;
         }
         
+        var dynamicDetail = await BiliService.GetDynamicDetail(httpClient, id);
+        await Task.Delay(2500);
+
+        if (dynamicDetail == null)
+        {
+            return;
+        }
         
         FinalText = "";
         
@@ -150,9 +167,10 @@ public class SpaceViewModel : ViewModelBase
         {
             var lazyComment =
                 await BiliService.GetLazyComment(httpClient, commentAreaType, oid, nextOffset);
-            if (lazyComment.Code != 0)
+            if (lazyComment is not { Code: 0 })
             {
                 ConsoleOutput += errorConsole;
+                isBreak = true;
                 continue;
             }
 

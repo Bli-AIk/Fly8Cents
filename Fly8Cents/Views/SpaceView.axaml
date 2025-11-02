@@ -20,6 +20,12 @@
                          AcceptsReturn="True"
                          VerticalContentAlignment="Top"
                          Padding="10" />
+                <TextBox Text="{Binding Offset, Mode=TwoWay}"
+                         Watermark="Offset..."
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         VerticalContentAlignment="Top"
+                         Padding="10" />
 
                 <Button Content="提取空间动态"
                         Command="{Binding ExtractSpaceCommand}"

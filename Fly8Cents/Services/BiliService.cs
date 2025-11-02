@@ -171,44 +171,54 @@ public static class BiliService
     ///     参考：
     ///     <see href="https://socialsisteryi.github.io/bilibili-API-collect/docs/comment/list.html" />
     /// </remarks>
-    public static async Task<LazyCommentData> GetLazyComment(HttpClient httpClient,
+    public static async Task<LazyCommentData?> GetLazyComment(HttpClient httpClient,
         CommentAreaType type,
         long oid,
         string nextOffset,
         int mode = 3)
     {
-        var parameters = new Dictionary<string, string>
+        try
         {
-            { "oid", oid.ToString() },
-            { "type", ((int)type).ToString() },
-            { "mode", mode.ToString() },
-            { "web_location", "1315875" },
-            { "plat", "1" }
-        };
+            var parameters = new Dictionary<string, string>
+            {
+                { "oid", oid.ToString() },
+                { "type", ((int)type).ToString() },
+                { "mode", mode.ToString() },
+                { "web_location", "1315875" },
+                { "plat", "1" }
+            };
 
-        if (string.IsNullOrEmpty(nextOffset))
-        {
-            parameters.Add("seek_rpid", "");
+            if (string.IsNullOrEmpty(nextOffset))
+            {
+                parameters.Add("seek_rpid", "");
+            }
+
+            var paginationObject = new { offset = nextOffset };
+            var paginationJson = JsonConvert.SerializeObject(paginationObject);
+            parameters.Add("pagination_str", paginationJson);
+
+            var signedParams = await BiliWbiService.SignAsync(parameters);
+
+            var query = await new FormUrlEncodedContent(signedParams).ReadAsStringAsync();
+            //输出示例： bar=514&baz=1919810&foo=114&wts=1687541921&w_rid=26e82b1b9b3a11dbb1807a9228a40d3b
+
+            var requestUri = $"https://api.bilibili.com/x/v2/reply/wbi/main?{query}";
+
+            Console.WriteLine(httpClient.DefaultRequestHeaders);
+            Console.WriteLine("RequestUri: " + requestUri);
+
+            var response = await httpClient.GetStringAsync(requestUri);
+
+            var data = LazyCommentData.FromJson(response);
+
+
+            return data;
         }
-
-        var paginationObject = new { offset = nextOffset };
-        var paginationJson = JsonConvert.SerializeObject(paginationObject);
-        parameters.Add("pagination_str", paginationJson);
-
-        var signedParams = await BiliWbiService.SignAsync(parameters);
-
-        var query = await new FormUrlEncodedContent(signedParams).ReadAsStringAsync();
-        //输出示例： bar=514&baz=1919810&foo=114&wts=1687541921&w_rid=26e82b1b9b3a11dbb1807a9228a40d3b
-
-        var requestUri = $"https://api.bilibili.com/x/v2/reply/wbi/main?{query}";
-
-        Console.WriteLine(httpClient.DefaultRequestHeaders);
-        Console.WriteLine("RequestUri: " + requestUri);
-
-        var response = await httpClient.GetStringAsync(requestUri);
-
-        var data = LazyCommentData.FromJson(response);
-        return data;
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
     }
 
     /// <summary>
@@ -252,9 +262,7 @@ public static class BiliService
         var data = UserSpaceDetailsData.FromJson(response);
         return data;
     }
-    
-    
-    
+
 
     /// <summary>
     ///     获取特定动态卡片信息
@@ -266,24 +274,31 @@ public static class BiliService
     ///     参考：
     ///     <see href="https://socialsisteryi.github.io/bilibili-API-collect/docs/dynamic/get_dynamic_detail.html" />
     /// </remarks>
-    public static async Task<DynamicDetailData> GetDynamicDetail(HttpClient httpClient,
+    public static async Task<DynamicDetailData?> GetDynamicDetail(HttpClient httpClient,
         long id)
     {
-        const string baseUrl = "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail";
-
-        var query = new Dictionary<string, string>
+        try
         {
-            { "dynamic_id", id.ToString() }
-        };
+            const string baseUrl = "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail";
 
-        var queryString = string.Join("&", query.Select(kvp =>
-            $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}"));
+            var query = new Dictionary<string, string>
+            {
+                { "dynamic_id", id.ToString() }
+            };
 
-        var requestUri = $"{baseUrl}?{queryString}";
+            var queryString = string.Join("&", query.Select(kvp =>
+                $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}"));
 
-        Console.WriteLine("RequestUri: " + requestUri);
-        var response = await httpClient.GetStringAsync(requestUri);
-        return DynamicDetailData.FromJson(response);
+            var requestUri = $"{baseUrl}?{queryString}";
+
+            Console.WriteLine("RequestUri: " + requestUri);
+            var response = await httpClient.GetStringAsync(requestUri);
+            return DynamicDetailData.FromJson(response);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
     }
-
 }
