@@ -120,6 +120,7 @@ public class SpaceViewModel : ViewModelBase
         ConsoleOutput += startConsole;
 
         var dynamicDetail = await BiliService.GetDynamicDetail(httpClient, id);
+        await Task.Delay(2500);
         
         var name = $"{id}.txt";
         if (File.Exists(name))
@@ -128,7 +129,6 @@ public class SpaceViewModel : ViewModelBase
             return;
         }
         
-        await Task.Delay(1000);
         
         FinalText = "";
         
